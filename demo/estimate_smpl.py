@@ -500,22 +500,28 @@ if __name__ == '__main__':
 
     parser = ArgumentParser()
     parser.add_argument(
-        'mesh_reg_config',
+        '--mesh_reg_config',
         type=str,
-        default=None,
+        default='configs/hmr/resnet50_hmr_pw3d.py',
         help='Config file for mesh regression')
     parser.add_argument(
-        'mesh_reg_checkpoint',
+        '--mesh_reg_checkpoint',
         type=str,
-        default=None,
+        default='data/checkpoints/resnet50_hmr_pw3d.pth',
+        # default='workspace/hmr/epoch_2.pth',
         help='Checkpoint file for mesh regression')
     parser.add_argument(
         '--single_person_demo',
+        default=True,
         action='store_true',
         help='Single person demo with MMDetection')
-    parser.add_argument('--det_config', help='Config file for detection')
+    parser.add_argument('--det_config',
+                        default='demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py',
+                        help='Config file for detection')
     parser.add_argument(
-        '--det_checkpoint', help='Checkpoint file for detection')
+        '--det_checkpoint',
+        default='https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_1x_coco/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth', 
+        help='Checkpoint file for detection')
     parser.add_argument(
         '--det_cat_id',
         type=int,
@@ -533,16 +539,16 @@ if __name__ == '__main__':
         default='data/body_models/',
         help='Body models file path')
     parser.add_argument(
-        '--input_path', type=str, default=None, help='Input path')
+        '--input_path', type=str, default='demo/resources/single_person_demo.mp4', help='Input path')
     parser.add_argument(
         '--output',
         type=str,
-        default=None,
+        default='demo_result',
         help='directory to save output result file')
     parser.add_argument(
         '--show_path',
         type=str,
-        default=None,
+        default='vis_results/single_person_demo.mp4',
         help='directory to save rendered images or video')
     parser.add_argument(
         '--render_choice',
@@ -558,18 +564,19 @@ if __name__ == '__main__':
         help='Bounding box score threshold')
     parser.add_argument(
         '--draw_bbox',
+        default=True,
         action='store_true',
         help='Draw a bbox for each detected instance')
     parser.add_argument(
         '--smooth_type',
         type=str,
-        default=None,
+        default='savgol',
         help='Smooth the data through the specified type.'
         'Select in [oneeuro,gaus1d,savgol].')
     parser.add_argument(
         '--speed_up_type',
         type=str,
-        default=None,
+        default='deciwatch',
         help='Speed up data processing through the specified type.'
         'Select in [deciwatch].')
     parser.add_argument(

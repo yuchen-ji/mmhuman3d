@@ -69,6 +69,7 @@ hrnet_extra = dict(
     ],
     final_conv_kernel=1,
     return_list=False,
+    multi_tasks=False,
 )
 
 find_unused_parameters = True
@@ -170,7 +171,7 @@ inference_pipeline = [
 
 data = dict(
     samples_per_gpu=64,
-    workers_per_gpu=0,
+    workers_per_gpu=9,
     train=dict(
         type='MixedDataset',
         configs=[

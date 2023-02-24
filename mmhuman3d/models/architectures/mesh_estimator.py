@@ -92,6 +92,7 @@ class BodyModelEstimator(BaseArchitecture, metaclass=ABCMeta):
                  loss_camera: Optional[Union[dict, None]] = None,
                  loss_adv: Optional[Union[dict, None]] = None,
                  loss_segm_mask: Optional[Union[dict, None]] = None,
+                 loss_heatmap2d: Optional[Union[dict, None]] = None,
                  init_cfg: Optional[Union[list, dict, None]] = None):
         super(BodyModelEstimator, self).__init__(init_cfg)
         self.backbone = build_backbone(backbone)
@@ -124,6 +125,9 @@ class BodyModelEstimator(BaseArchitecture, metaclass=ABCMeta):
         self.loss_segm_mask = build_loss(loss_segm_mask)
         set_requires_grad(self.body_model_train, False)
         set_requires_grad(self.body_model_test, False)
+        
+        # 23.02.24 add heatmap2d loss
+        self.loss_heatmap2d = build_loss(loss_heatmap2d)
 
     def train_step(self, data_batch, optimizer, **kwargs):
         """Train step function.
@@ -154,8 +158,14 @@ class BodyModelEstimator(BaseArchitecture, metaclass=ABCMeta):
         if self.neck is not None:
             features = self.neck(features)
 
-        predictions = self.head(features)
-        targets = self.prepare_targets(data_batch)
+        # By Yuchen, modifed in 23.02.24, predictions
+        if isinstance(features, list):
+            predictions = self.head(features[0])
+            predictions['pred_heatmap2d'] = features[1]
+            targets = self.prepare_targets(data_batch)
+        else:
+            predictions = self.head(features)
+            targets = self.prepare_targets(data_batch)
 
         # optimize discriminator (if have)
         if self.disc is not None:
@@ -612,6 +622,13 @@ class BodyModelEstimator(BaseArchitecture, metaclass=ABCMeta):
 
         loss = self.loss_segm_mask(pred_heatmap_valid, gt_sem_mask)
         return loss
+    # By Yuchen, 23.02.24
+    def compute_heatmap2d_loss(self, 
+                               pred_heatmap2d: torch.Tensor, 
+                               gt_heatmap2d: torch.Tensor, 
+                               gt_heatmap2d_conf: torch.Tensor):
+        loss = self.loss_heatmap2d(pred_heatmap2d, gt_heatmap2d, gt_heatmap2d_conf)
+        return loss
 
     def compute_losses(self, predictions: dict, targets: dict):
         """Compute losses."""
@@ -669,6 +686,10 @@ class BodyModelEstimator(BaseArchitecture, metaclass=ABCMeta):
             has_keypoints2d = None
         if 'pred_segm_mask' in predictions:
             pred_segm_mask = predictions['pred_segm_mask']
+        if 'pred_heatmap2d' in predictions:
+            pred_heatmap2d = predictions['pred_heatmap2d']
+            gt_heatmap2d = targets['heatmap2d']
+            gt_heatmap2d_conf = targets['heatmap2d_conf']
         losses = {}
         if self.loss_keypoints3d is not None:
             losses['keypoints3d_loss'] = self.compute_keypoints3d_loss(
@@ -696,6 +717,10 @@ class BodyModelEstimator(BaseArchitecture, metaclass=ABCMeta):
             losses['loss_segm_mask'] = self.compute_part_segmentation_loss(
                 pred_segm_mask, gt_vertices, gt_keypoints2d, gt_model_joints,
                 has_smpl)
+            
+        # By Yuchen, 23.02.24 add heatmapmse loss
+        if self.loss_heatmap2d is not None:
+            losses['heatmap2d_loss'] = self.compute_heatmap2d_loss(pred_heatmap2d, gt_heatmap2d, gt_heatmap2d_conf)
 
         return losses
 
@@ -785,6 +810,10 @@ class ImageBodyModelEstimator(BodyModelEstimator):
         all_preds['image_path'] = image_path
         all_preds['image_idx'] = kwargs['sample_idx']
         return all_preds
+
+
+# class MultiTasksBodyModelEstimator(BodyModelEstimator):
+    
 
 
 class VideoBodyModelEstimator(BodyModelEstimator):

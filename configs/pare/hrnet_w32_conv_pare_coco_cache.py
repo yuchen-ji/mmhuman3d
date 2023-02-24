@@ -28,6 +28,7 @@ width = 32
 downsample = False
 use_conv = True
 hrnet_extra = dict(
+    # 每一个stage都会进行一次下采样，增加一个分支
     stage1=dict(
         num_modules=1,
         num_branches=1,
@@ -51,6 +52,7 @@ hrnet_extra = dict(
         num_branches=4,
         block='BASIC',
         num_blocks=(4, 4, 4, 4),
+        # 这里 num_channels 是不同分支的通道数，一共有 4 个分支。
         num_channels=(width, width * 2, width * 4, width * 8)),
     downsample=downsample,
     use_conv=use_conv,

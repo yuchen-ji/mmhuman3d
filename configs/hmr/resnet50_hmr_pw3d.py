@@ -30,7 +30,7 @@ model = dict(
         depth=50,
         out_indices=[3],
         norm_eval=False,
-        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        # norm_cfg=dict(type='SyncBN', requires_grad=True),
         init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet50')),
     head=dict(
         type='HMRHead',
@@ -125,14 +125,14 @@ data = dict(
                     data_prefix='data',
                     pipeline=train_pipeline,
                     convention='smpl_54',
-                    ann_file='h36m_mosh_train.npz'),
-                dict(
-                    type=dataset_type,
-                    dataset_name='mpi_inf_3dhp',
-                    data_prefix='data',
-                    pipeline=train_pipeline,
-                    convention='smpl_54',
-                    ann_file='mpi_inf_3dhp_train.npz'),
+                    ann_file='h36m_train.npz'),
+                # dict(
+                #     type=dataset_type,
+                #     dataset_name='mpi_inf_3dhp',
+                #     data_prefix='data',
+                #     pipeline=train_pipeline,
+                #     convention='smpl_54',
+                #     ann_file='mpi_inf_3dhp_train.npz'),
                 dict(
                     type=dataset_type,
                     dataset_name='lsp',

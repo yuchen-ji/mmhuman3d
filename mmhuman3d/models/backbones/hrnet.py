@@ -244,7 +244,7 @@ class PoseHighResolutionNet(BaseModule):
                  norm_cfg=dict(type='BN'),
                  norm_eval=True,
                  with_cp=False,
-                 num_joints=24,
+                 num_joints=54,
                  zero_init_residual=False,
                  multiscale_output=True,
                  pretrained=None,
@@ -366,6 +366,7 @@ class PoseHighResolutionNet(BaseModule):
             kernel_size=extra['final_conv_kernel'],
             stride=1,
             padding=1 if extra['final_conv_kernel'] == 3 else 0)
+        
         if extra['downsample'] and extra['use_conv']:
             self.downsample_stage_1 = self._make_downsample_layer(
                 3, num_channel=self.stage2_cfg['num_channels'][0])
@@ -380,6 +381,9 @@ class PoseHighResolutionNet(BaseModule):
                 2, num_channel=self.stage3_cfg['num_channels'][-1])
             self.upsample_stage_4 = self._make_upsample_layer(
                 3, num_channel=self.stage4_cfg['num_channels'][-1])
+        
+        # 23.02.01 add neck --> 2048 features
+        self.incre_modules, self.downsamp_modules, self.neck_layer = self._make_neck(pre_stage_channels)
 
     @property
     def norm1(self):
@@ -563,6 +567,58 @@ class PoseHighResolutionNet(BaseModule):
 
         return nn.Sequential(*layers)
 
+    # 23.02.02 add hrnet neck module: ---> 2048 features
+    def _make_neck(self, in_channels):
+        BN_MOMENTUM = 0.1
+        head_block = Bottleneck
+        head_channels = [32, 64, 128, 256]
+        
+        incre_modules = []
+        for i, channels in enumerate(in_channels):
+            incre_module = self._make_layer(
+                head_block,
+                channels,
+                head_channels[i],
+                1,
+                stride=1,
+            )
+            incre_modules.append(incre_module)
+        incre_modules = nn.ModuleList(incre_modules)
+        
+        # downsampling modules
+        downsamp_modules = []
+        for i in range(len(in_channels)-1):
+            in_channels = head_channels[i] * head_block.expansion
+            out_channels = head_channels[i+1] * head_block.expansion
+            
+            downsamp_module = nn.Sequential(
+                nn.Conv2d(
+                    in_channels=in_channels,
+                    out_channels=out_channels,
+                    kernel_size=3,
+                    stride=2,
+                    padding=1
+                ),
+                nn.BatchNorm2d(out_channels, momentum=BN_MOMENTUM),
+                nn.ReLU(inplace=True)                                
+            )
+            downsamp_modules.append(downsamp_module)
+        downsamp_modules = nn.ModuleList(downsamp_modules)
+        
+        neck_layer = nn.Sequential(
+            nn.Conv2d(
+                in_channels=head_channels[-1] * head_block.expansion,
+                out_channels=2048,
+                kernel_size=1,
+                stride=1,
+                padding=0
+            ),
+            nn.BatchNorm2d(2048, momentum=BN_MOMENTUM),
+            nn.ReLU(inplace=True)
+        )
+        
+        return incre_modules, downsamp_modules, neck_layer  
+
     def forward(self, x):
         """Forward function."""
         x = self.conv1(x)
@@ -596,8 +652,23 @@ class PoseHighResolutionNet(BaseModule):
             else:
                 x_list.append(y_list[i])
         y_list = self.stage4(x_list)
+          
+        # type of return value
         if self.extra['return_list']:
             return y_list
+        elif self.extra['multi_tasks']:
+            #  23.02.01/24, add neck branch and pose branch, forward function, for multi-task hrnet prediction
+            x1 = self.incre_modules[0](y_list[0])
+            for i in range(len(self.downsamp_modules)):
+                x1 = self.incre_modules[i+1](y_list[i+1]) + self.downsamp_modules[i](x1)
+            x1 = self.neck_layer(x1)
+            if torch._C._get_tracing_state():
+                x1 = x1.flatten(start_dim=2).mean(dim=2)
+            else:
+                x1 = F.avg_pool2d(x1, kernel_size=x1.size()[2:]).view(x1.size(0), -1)            
+            x2 = self.final_layer(y_list[0])
+            my_list = [x1, x2] 
+            return my_list
         elif self.extra['downsample']:
             if self.extra['use_conv']:
                 # Downsampling with strided convolutions

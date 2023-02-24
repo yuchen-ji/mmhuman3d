@@ -19,16 +19,18 @@ from mmhuman3d.utils.logger import get_root_logger
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a model')
-    parser.add_argument('config', help='train config file path')
-    parser.add_argument('--work-dir', help='the dir to save logs and models')
+    parser.add_argument('--config', default='configs/ormr/hrnet_w32_ormr.py', help='train config file path')
+    parser.add_argument('--work-dir', default='workspace/ormr', help='the dir to save logs and models')
     parser.add_argument(
         '--resume-from', help='the checkpoint file to resume from')
     parser.add_argument(
         '--no-validate',
+        default=True,
         action='store_true',
         help='whether not to evaluate the checkpoint during training')
     group_gpus = parser.add_mutually_exclusive_group()
     group_gpus.add_argument('--device', help='device used for training')
+    # set 1, don't use distributed training
     group_gpus.add_argument(
         '--gpus',
         type=int,
@@ -37,6 +39,7 @@ def parse_args():
     group_gpus.add_argument(
         '--gpu-ids',
         type=int,
+        default=[4],
         nargs='+',
         help='ids of gpus to use '
         '(only applicable to non-distributed training)')

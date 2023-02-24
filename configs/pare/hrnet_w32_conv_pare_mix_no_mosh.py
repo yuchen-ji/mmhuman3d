@@ -69,6 +69,7 @@ hrnet_extra = dict(
     ],
     final_conv_kernel=1,
     return_list=False,
+    multi_tasks=False,
 )
 
 find_unused_parameters = True
@@ -115,7 +116,7 @@ model = dict(
     loss_camera=dict(type='CameraPriorLoss', loss_weight=1),
     init_cfg=dict(
         type='Pretrained',
-        checkpoint=('data/pretrained_models/hrnet_w32_conv_pare_coco.pth')),
+        checkpoint=('data/pretrained_models/hrnet_pretrain.pth')),
 )
 
 # dataset settings
@@ -167,7 +168,7 @@ inference_pipeline = [
 
 data = dict(
     samples_per_gpu=32,
-    workers_per_gpu=0,
+    workers_per_gpu=1,
     train=dict(
         type='MixedDataset',
         configs=[

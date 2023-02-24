@@ -413,6 +413,7 @@ if __name__ == '__main__':
         help='Checkpoint file for mesh regression')
     parser.add_argument(
         '--single_person_demo',
+        default=True,
         action='store_true',
         help='Single person demo with MMDetection')
     parser.add_argument(

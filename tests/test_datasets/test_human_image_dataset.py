@@ -9,14 +9,13 @@ from mmhuman3d.data.datasets.pipelines import (
     RandomHorizontalFlip,
 )
 
-
 def test_human_image_dataset():
     # test auto padding for bbox_xywh
     train_dataset = HumanImageDataset(
-        data_prefix='tests/data',
+        data_prefix='data/datasets',
         pipeline=[],
         dataset_name='h36m',
-        ann_file='sample_3dpw_test.npz')
+        ann_file='h36m_train.npz')
     train_dataset.human_data.pop('bbox_xywh')
     data = train_dataset[0]
     assert sum(data['scale']) == 0
@@ -238,3 +237,7 @@ def test_human_image_dataset_smc():
     for i, data in enumerate(train_dataset):
         for key in data_keys:
             assert key in data
+
+
+if __name__ == '__main__':
+    test_human_image_dataset()

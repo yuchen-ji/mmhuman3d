@@ -173,3 +173,38 @@ class KeypointMSELoss(nn.Module):
             sigma=self.sigma)
 
         return loss
+
+
+# 20.02.19 add 2dkeypoints heatmap loss
+class HeatmapMSELoss(nn.Module):
+    def __init__(self, reduction='mean', loss_weight=1.0):
+        super().__init__()
+        self.criterion = nn.MSELoss(reduction=reduction)
+        self.loss_weight = loss_weight
+        
+    def forward(self, pred, target, target_conf):
+        batch_size = pred.size(0)
+        num_joints = pred.size(1)
+        heatmaps_pred = pred.reshape((batch_size, num_joints, -1)).split(1, 1)
+        heatmaps_gt = target.reshape((batch_size, num_joints, -1)).split(1, 1)
+        loss = 0
+
+        for idx in range(num_joints):
+            heatmap_pred = heatmaps_pred[idx].squeeze()
+            heatmap_gt = heatmaps_gt[idx].squeeze()
+            loss += 0.5 * self.criterion(
+                heatmap_pred.mul(target_conf[:, idx]),
+                heatmap_gt.mul(target_conf[:, idx])
+            )
+        
+        return self.loss_weight * (loss / num_joints)
+    
+    
+if __name__ == '__main__':
+    loss = HeatmapMSELoss()
+    data = torch.zeros((16, 17, 3))
+    target = torch.ones((16, 17, 3))
+    target_conf = torch.ones((16, 17, 1))
+    
+    num = loss(data, target, target_conf)
+    print(num)

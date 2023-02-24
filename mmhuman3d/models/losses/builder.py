@@ -5,7 +5,7 @@ from mmcv.utils import Registry
 from .balanced_mse_loss import BMCLossMD
 from .cross_entropy_loss import CrossEntropyLoss
 from .gan_loss import GANLoss
-from .mse_loss import KeypointMSELoss, MSELoss
+from .mse_loss import KeypointMSELoss, MSELoss, HeatmapMSELoss
 from .prior_loss import (
     CameraPriorLoss,
     JointPriorLoss,
@@ -43,6 +43,9 @@ LOSSES.register_module(name='SmoothL1Loss', module=SmoothL1Loss)
 LOSSES.register_module(name='CrossEntropyLoss', module=CrossEntropyLoss)
 LOSSES.register_module(name='RotationDistance', module=RotationDistance)
 LOSSES.register_module(name='BMCLossMD', module=BMCLossMD)
+
+# 20.02.19 add 2d keypoints heatmap loss
+LOSSES.register_module(name='HeatmapMSELoss', module=HeatmapMSELoss) 
 
 
 def build_loss(cfg):
