@@ -17,6 +17,10 @@
 
 </div>
 
+## Custom configuration
+Docker images: `nvidia/cuda:11.0.3-cudnn8-devel-ubuntu20.04`
+Dependencies: follow `ormr.yaml` to install.
+
 ## Introduction
 
 English | [简体中文](README_CN.md)
@@ -178,3 +182,5 @@ We wish that the toolbox and benchmark could serve the growing research communit
 - [MMSelfSup](https://github.com/open-mmlab/mmselfsup): OpenMMLab self-supervised learning toolbox and benchmark.
 - [MMRazor](https://github.com/open-mmlab/mmrazor): OpenMMLab model compression toolbox and benchmark.
 - [MMDeploy](https://github.com/open-mmlab/mmdeploy): OpenMMLab model deployment framework.
+
+
