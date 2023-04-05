@@ -18,7 +18,7 @@
 </div>
 
 ## Custom configuration
-Docker images: `nvidia/cuda:11.0.3-cudnn8-devel-ubuntu20.04`
+Docker images: `nvidia/cuda:11.0.3-cudnn8-devel-ubuntu20.04`.
 Dependencies: follow `ormr.yaml` to install.
 
 ## Introduction
