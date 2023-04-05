@@ -146,3 +146,4 @@ logs/
 # *.log.json
 # *.log
 !demo/resources/*
+workspace/ormr/val/*.json
