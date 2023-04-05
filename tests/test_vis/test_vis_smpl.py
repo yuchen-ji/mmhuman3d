@@ -701,3 +701,7 @@ def test_visualize_smpl_pose():
             mesh_file_path='/tmp',
             palette=None,
             device=device_name)
+        
+
+if __name__ == '__main__':
+    test_visualize_smpl_pose()

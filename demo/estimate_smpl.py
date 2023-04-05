@@ -15,7 +15,7 @@ from mmhuman3d.apis import (
     inference_video_based_model,
     init_model,
 )
-from mmhuman3d.core.visualization.visualize_smpl import visualize_smpl_hmr
+from mmhuman3d.core.visualization.visualize_smpl import visualize_smpl_hmr, visualize_smpl_pose
 from mmhuman3d.data.data_structures.human_data import HumanData
 from mmhuman3d.utils.demo_utils import (
     extract_feature_sequence,
@@ -289,6 +289,13 @@ def single_person_with_mmdet(args, frames_iter):
             overwrite=True,
             palette=args.palette,
             read_frames_batch=True)
+        # visualize_smpl_pose(
+        #     poses=smpl_poses.reshape(-1, 24 * 3),
+        #     body_model_config=body_model_config,
+        #     betas=smpl_betas,
+        #     output_path='workspace/demo/smpl',
+        #     resolution=(1024, 1024))
+
         if args.output is None:
             shutil.rmtree(frames_folder)
 
@@ -502,12 +509,13 @@ if __name__ == '__main__':
     parser.add_argument(
         '--mesh_reg_config',
         type=str,
-        default='configs/hmr/resnet50_hmr_pw3d.py',
+        default='configs/ormr/hrnet_w32_ormr.py',
         help='Config file for mesh regression')
     parser.add_argument(
         '--mesh_reg_checkpoint',
         type=str,
-        default='data/checkpoints/resnet50_hmr_pw3d.pth',
+        # default='workspace/ormr/epoch6_wo_crop/epoch_6.pth',
+        default='workspace/ormr/epoch_7.pth',
         # default='workspace/hmr/epoch_2.pth',
         help='Checkpoint file for mesh regression')
     parser.add_argument(
@@ -539,16 +547,18 @@ if __name__ == '__main__':
         default='data/body_models/',
         help='Body models file path')
     parser.add_argument(
-        '--input_path', type=str, default='demo/resources/single_person_demo.mp4', help='Input path')
+        '--input_path', type=str, default='workspace/demo/input.mp4', help='Input path')
+        # '--input_path', type=str, default='workspace/demo/1.png', help='Input path')
     parser.add_argument(
         '--output',
         type=str,
-        default='demo_result',
+        # default='demo_result',
+        default=None,
         help='directory to save output result file')
     parser.add_argument(
         '--show_path',
         type=str,
-        default='vis_results/single_person_demo.mp4',
+        default='workspace/demo/input_results.mp4',
         help='directory to save rendered images or video')
     parser.add_argument(
         '--render_choice',
@@ -556,27 +566,29 @@ if __name__ == '__main__':
         default='hq',
         help='Render choice parameters')
     parser.add_argument(
-        '--palette', type=str, default='segmentation', help='Color theme')
+        '--palette', type=str, default='white', help='Color theme')
     parser.add_argument(
         '--bbox_thr',
         type=float,
-        default=0.99,
+        default=0.8,
         help='Bounding box score threshold')
     parser.add_argument(
         '--draw_bbox',
-        default=True,
+        default=False,
         action='store_true',
         help='Draw a bbox for each detected instance')
     parser.add_argument(
         '--smooth_type',
         type=str,
-        default='savgol',
+        default=None,
+        # default='savgol',
         help='Smooth the data through the specified type.'
         'Select in [oneeuro,gaus1d,savgol].')
     parser.add_argument(
         '--speed_up_type',
         type=str,
-        default='deciwatch',
+        # default='deciwatch',
+        default=None,
         help='Speed up data processing through the specified type.'
         'Select in [deciwatch].')
     parser.add_argument(
@@ -584,7 +596,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--device',
         choices=['cpu', 'cuda'],
-        default='cuda',
+        default='cuda:0',
         help='device used for testing')
     args = parser.parse_args()
 

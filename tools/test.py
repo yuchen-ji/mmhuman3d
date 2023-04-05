@@ -20,15 +20,16 @@ from mmhuman3d.models.architectures.builder import build_architecture
 
 def parse_args():
     parser = argparse.ArgumentParser(description='mmhuman3d test model')
-    parser.add_argument('config', help='test config file path')
+    parser.add_argument('--config', default='configs/ormr/hrnet_w32_ormr.py', help='test config file path')
     parser.add_argument(
-        '--work-dir', help='the dir to save evaluation results')
-    parser.add_argument('checkpoint', help='checkpoint file')
+        '--work-dir', default='workspace/ormr/eval', help='the dir to save evaluation results')
+    parser.add_argument('--checkpoint', default='workspace/ormr/epoch_4.pth', help='checkpoint file')
     parser.add_argument('--out', help='output result file')
     parser.add_argument(
         '--metrics',
         type=str,
         nargs='+',
+        # default='mpjpe',
         default='pa-mpjpe',
         help='evaluation metric, which depends on the dataset,'
         ' e.g., "pa-mpjpe" for H36M')

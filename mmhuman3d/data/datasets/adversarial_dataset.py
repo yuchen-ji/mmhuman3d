@@ -28,7 +28,7 @@ def gen_heatmap(heatmap_size, image_size, joints):
         # gaussian range, ul:left-top, br:right-down
         ul = [int(mu_x-tmp_size), int(mu_y-tmp_size)]
         br = [int(mu_x+tmp_size+1), int(mu_y+tmp_size+1)]
-        # 这一段貌似没有什么用
+        # 排除热力图部分全部在图像之外的点，并将该点的vis设置为0
         if ul[0] >= heatmap_size[0] or ul[1] >= heatmap_size[1] or br[0] < 0 or br[1] < 0:
             target_conf[joint_id] = 0
             continue
@@ -86,7 +86,7 @@ class AdversarialDataset(Dataset):
         """
         data = self.train_dataset[idx]
         
-        # By Yuchen, 20.02.18, add 2d keypoints heatmap
+        # By Yuchen, 23.02.18, add 2d keypoints heatmap
         heatmap_size = np.array([56, 56])
         image_size = np.array([data['img'].shape[1], data['img'].shape[2]])
         joints = data['keypoints2d'][:].numpy()

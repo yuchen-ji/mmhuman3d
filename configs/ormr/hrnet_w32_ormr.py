@@ -2,25 +2,28 @@ _base_ = ['../_base_/default_runtime.py']
 use_adversarial_train = True
 
 # evaluate
-evaluation = dict(interval=10, metric=['pa-mpjpe', 'mpjpe'])
+# evaluation = dict(interval=10, metric=['pa-mpjpe', 'mpjpe'])
 
 img_res = 224
+resume_from = 'workspace/ormr/epoch6_wo_crop/epoch_6.pth'
 
 # optimizer
 optimizer = dict(
-    backbone=dict(type='Adam', lr=2.0e-4),
-    head=dict(type='Adam', lr=2.0e-4),
-    disc=dict(type='Adam', lr=1.0e-4)
+    backbone=dict(type='Adam', lr=1.0e-4),
+    head=dict(type='Adam', lr=1.0e-4),
+    # disc=dict(type='Adam', lr=1.0e-4)
 )
 optimizer_config = dict(grad_clip=None)
 
 # learning policy
 lr_config = dict(policy='Fixed', by_epoch=False)
 runner = dict(type='EpochBasedRunner', max_epochs=200)
+# runner = dict(type='IterBasedRunner', max_iters=200)
 
 log_config = dict(
     interval=50, hooks=[
         dict(type='TextLoggerHook'),
+        dict(type='TensorboardLoggerHook')
     ])
 
 checkpoint_config = dict(interval=1)
@@ -106,14 +109,14 @@ model = dict(
     loss_vertex=dict(type='L1Loss', loss_weight=2),
     loss_smpl_pose=dict(type='MSELoss', loss_weight=3),
     loss_smpl_betas=dict(type='MSELoss', loss_weight=0.02),
-    loss_adv=dict(
-        type='GANLoss',
-        gan_type='lsgan',
-        real_label_val=1.0,
-        fake_label_val=0.0,
-        loss_weight=1),
-    disc=dict(type='SMPLDiscriminator'),
-    loss_heatmap2d=dict(type='HeatmapMSELoss')
+    # loss_adv=dict(
+    #     type='GANLoss',
+    #     gan_type='lsgan',
+    #     real_label_val=1.0,
+    #     fake_label_val=0.0,
+    #     loss_weight=1),
+    # disc=dict(type='SMPLDiscriminator'),
+    loss_heatmap2d=dict(type='HeatmapMSELoss', loss_weight=300)
     )
 
 # dataset settings
@@ -128,6 +131,7 @@ data_keys = [
 # training settings
 train_pipeline = [
     dict(type='LoadImageFromFile'),
+    dict(type='RandomCrop', crop_prob=0.5),
     dict(type='RandomChannelNoise', noise_factor=0.4),
     dict(type='RandomHorizontalFlip', flip_prob=0.5, convention='smpl_54'),
     dict(type='GetRandomScaleRotation', rot_factor=30, scale_factor=0.25),
@@ -147,6 +151,7 @@ train_adv_pipeline = [dict(type='Collect', keys=adv_data_keys, meta_keys=[])]
 
 test_pipeline = [
     dict(type='LoadImageFromFile'),
+    # dict(type='RandomCrop', crop_prob=1.0),
     dict(type='GetRandomScaleRotation', rot_factor=0, scale_factor=0),
     dict(type='MeshAffine', img_res=224),
     dict(type='Normalize', **img_norm_cfg),
@@ -184,13 +189,13 @@ data = dict(
                     pipeline=train_pipeline,
                     convention='smpl_54',
                     ann_file='h36m_train.npz'),
-                # dict(
-                #     type=dataset_type,
-                #     dataset_name='mpi_inf_3dhp',
-                #     data_prefix='data',
-                #     pipeline=train_pipeline,
-                #     convention='smpl_54',
-                #     ann_file='mpi_inf_3dhp_train.npz'),
+                dict(
+                    type=dataset_type,
+                    dataset_name='mpi_inf_3dhp',
+                    data_prefix='data',
+                    pipeline=train_pipeline,
+                    convention='smpl_54',
+                    ann_file='mpi_inf_3dhp_train.npz'),
                 dict(
                     type=dataset_type,
                     dataset_name='lsp',

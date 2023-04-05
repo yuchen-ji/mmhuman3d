@@ -1,0 +1,3499 @@
+2023-02-24 20:32:13,437 - mmhuman3d - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.16 (default, Jan 17 2023, 23:13:24) [GCC 11.2.0]
+CUDA available: True
+GPU 0,1,2,3,4,5,6,7: NVIDIA TITAN RTX
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 11.0, V11.0.221
+GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+PyTorch: 1.8.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2021.4-Product Build 20210904 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.7.0 (Git Hash 7aed236906b1f7a05c0917e5257a1af05e9ff683)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 10.2
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_37,code=compute_37
+  - CuDNN 7.6.5
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=10.2, CUDNN_VERSION=7.6.5, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.8.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+TorchVision: 0.9.0
+OpenCV: 4.7.0
+MMCV: 1.5.3
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 10.2
+MMHuman3d: 0.10.0+32fb6c7
+------------------------------------------------------------
+
+2023-02-24 20:32:13,439 - mmhuman3d - INFO - Distributed training: False
+2023-02-24 20:32:16,284 - mmhuman3d - INFO - Config:
+checkpoint_config = dict(interval=10)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+use_adversarial_train = True
+evaluation = dict(interval=10, metric=['pa-mpjpe', 'mpjpe'])
+img_res = 224
+optimizer = dict(
+    backbone=dict(type='Adam', lr=0.0002), head=dict(type='Adam', lr=0.0002))
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(policy='Fixed', by_epoch=False)
+runner = dict(type='EpochBasedRunner', max_epochs=200)
+width = 32
+downsample = False
+use_conv = True
+hrnet_extra = dict(
+    stage1=dict(
+        num_modules=1,
+        num_branches=1,
+        block='BOTTLENECK',
+        num_blocks=(4, ),
+        num_channels=(64, )),
+    stage2=dict(
+        num_modules=1,
+        num_branches=2,
+        block='BASIC',
+        num_blocks=(4, 4),
+        num_channels=(32, 64)),
+    stage3=dict(
+        num_modules=4,
+        num_branches=3,
+        block='BASIC',
+        num_blocks=(4, 4, 4),
+        num_channels=(32, 64, 128)),
+    stage4=dict(
+        num_modules=3,
+        num_branches=4,
+        block='BASIC',
+        num_blocks=(4, 4, 4, 4),
+        num_channels=(32, 64, 128, 256)),
+    downsample=False,
+    use_conv=True,
+    pretrained_layers=[
+        'conv1', 'bn1', 'conv2', 'bn2', 'layer1', 'transition1', 'stage2',
+        'transition2', 'stage3', 'transition3', 'stage4'
+    ],
+    final_conv_kernel=1,
+    return_list=False,
+    multi_tasks=False)
+find_unused_parameters = True
+model = dict(
+    type='ImageBodyModelEstimator',
+    backbone=dict(
+        type='PoseHighResolutionNet',
+        extra=dict(
+            stage1=dict(
+                num_modules=1,
+                num_branches=1,
+                block='BOTTLENECK',
+                num_blocks=(4, ),
+                num_channels=(64, )),
+            stage2=dict(
+                num_modules=1,
+                num_branches=2,
+                block='BASIC',
+                num_blocks=(4, 4),
+                num_channels=(32, 64)),
+            stage3=dict(
+                num_modules=4,
+                num_branches=3,
+                block='BASIC',
+                num_blocks=(4, 4, 4),
+                num_channels=(32, 64, 128)),
+            stage4=dict(
+                num_modules=3,
+                num_branches=4,
+                block='BASIC',
+                num_blocks=(4, 4, 4, 4),
+                num_channels=(32, 64, 128, 256)),
+            downsample=False,
+            use_conv=True,
+            pretrained_layers=[
+                'conv1', 'bn1', 'conv2', 'bn2', 'layer1', 'transition1',
+                'stage2', 'transition2', 'stage3', 'transition3', 'stage4'
+            ],
+            final_conv_kernel=1,
+            return_list=False,
+            multi_tasks=False),
+        num_joints=24,
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint='data/pretrained_models/hrnet_pretrain.pth')),
+    head=dict(
+        type='PareHead',
+        num_joints=24,
+        num_input_features=480,
+        smpl_mean_params='data/body_models/smpl_mean_params.npz',
+        num_deconv_layers=2,
+        num_deconv_filters=[128, 128],
+        num_deconv_kernels=[4, 4],
+        use_heatmaps='part_segm',
+        use_keypoint_attention=True,
+        backbone='hrnet_w32-conv'),
+    body_model_train=dict(
+        type='SMPL',
+        keypoint_src='smpl_54',
+        keypoint_dst='smpl_49',
+        model_path='data/body_models/smpl',
+        keypoint_approximate=True,
+        extra_joints_regressor='data/body_models/J_regressor_extra.npy'),
+    body_model_test=dict(
+        type='SMPL',
+        keypoint_src='h36m',
+        keypoint_dst='h36m',
+        model_path='data/body_models/smpl',
+        joints_regressor='data/body_models/J_regressor_h36m.npy'),
+    convention='smpl_49',
+    loss_keypoints3d=dict(type='MSELoss', loss_weight=300),
+    loss_keypoints2d=dict(type='MSELoss', loss_weight=300),
+    loss_smpl_pose=dict(type='MSELoss', loss_weight=60),
+    loss_smpl_betas=dict(type='MSELoss', loss_weight=0.06),
+    loss_segm_mask=dict(type='CrossEntropyLoss', loss_weight=60),
+    loss_camera=dict(type='CameraPriorLoss', loss_weight=1))
+dataset_type = 'HumanImageDataset'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+data_keys = [
+    'has_smpl', 'has_keypoints3d', 'has_keypoints2d', 'smpl_body_pose',
+    'smpl_global_orient', 'smpl_betas', 'smpl_transl', 'keypoints2d',
+    'keypoints3d', 'sample_idx'
+]
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='RandomChannelNoise', noise_factor=0.4),
+    dict(
+        type='SyntheticOcclusion',
+        occluders_file='data/occluders/pascal_occluders.npy'),
+    dict(type='RandomHorizontalFlip', flip_prob=0.5, convention='smpl_49'),
+    dict(type='GetRandomScaleRotation', rot_factor=30, scale_factor=0.25),
+    dict(type='MeshAffine', img_res=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(
+        type='ToTensor',
+        keys=[
+            'has_smpl', 'has_keypoints3d', 'has_keypoints2d', 'smpl_body_pose',
+            'smpl_global_orient', 'smpl_betas', 'smpl_transl', 'keypoints2d',
+            'keypoints3d', 'sample_idx'
+        ]),
+    dict(
+        type='Collect',
+        keys=[
+            'img', 'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+            'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+            'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+        ],
+        meta_keys=['image_path', 'center', 'scale', 'rotation'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='GetRandomScaleRotation', rot_factor=0, scale_factor=0),
+    dict(type='MeshAffine', img_res=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(
+        type='ToTensor',
+        keys=[
+            'has_smpl', 'has_keypoints3d', 'has_keypoints2d', 'smpl_body_pose',
+            'smpl_global_orient', 'smpl_betas', 'smpl_transl', 'keypoints2d',
+            'keypoints3d', 'sample_idx'
+        ]),
+    dict(
+        type='Collect',
+        keys=[
+            'img', 'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+            'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+            'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+        ],
+        meta_keys=['image_path', 'center', 'scale', 'rotation'])
+]
+inference_pipeline = [
+    dict(type='MeshAffine', img_res=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(
+        type='Collect',
+        keys=['img', 'sample_idx'],
+        meta_keys=['image_path', 'center', 'scale', 'rotation'])
+]
+data = dict(
+    samples_per_gpu=64,
+    workers_per_gpu=9,
+    train=dict(
+        type='MixedDataset',
+        configs=[
+            dict(
+                type='HumanImageDataset',
+                dataset_name='coco',
+                data_prefix='data',
+                pipeline=[
+                    dict(type='LoadImageFromFile'),
+                    dict(type='RandomChannelNoise', noise_factor=0.4),
+                    dict(
+                        type='SyntheticOcclusion',
+                        occluders_file='data/occluders/pascal_occluders.npy'),
+                    dict(
+                        type='RandomHorizontalFlip',
+                        flip_prob=0.5,
+                        convention='smpl_49'),
+                    dict(
+                        type='GetRandomScaleRotation',
+                        rot_factor=30,
+                        scale_factor=0.25),
+                    dict(type='MeshAffine', img_res=224),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(
+                        type='ToTensor',
+                        keys=[
+                            'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                            'smpl_body_pose', 'smpl_global_orient',
+                            'smpl_betas', 'smpl_transl', 'keypoints2d',
+                            'keypoints3d', 'sample_idx'
+                        ]),
+                    dict(
+                        type='Collect',
+                        keys=[
+                            'img', 'has_smpl', 'has_keypoints3d',
+                            'has_keypoints2d', 'smpl_body_pose',
+                            'smpl_global_orient', 'smpl_betas', 'smpl_transl',
+                            'keypoints2d', 'keypoints3d', 'sample_idx'
+                        ],
+                        meta_keys=[
+                            'image_path', 'center', 'scale', 'rotation'
+                        ])
+                ],
+                convention='smpl_49',
+                ann_file='eft_coco_all.npz')
+        ],
+        partition=[1.0]),
+    test=dict(
+        type='HumanImageDataset',
+        body_model=dict(
+            type='GenderedSMPL',
+            keypoint_src='h36m',
+            keypoint_dst='h36m',
+            model_path='data/body_models/smpl',
+            joints_regressor='data/body_models/J_regressor_h36m.npy'),
+        dataset_name='pw3d',
+        data_prefix='data',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='GetRandomScaleRotation', rot_factor=0, scale_factor=0),
+            dict(type='MeshAffine', img_res=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(
+                type='ToTensor',
+                keys=[
+                    'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                    'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+                    'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+                ]),
+            dict(
+                type='Collect',
+                keys=[
+                    'img', 'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                    'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+                    'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+                ],
+                meta_keys=['image_path', 'center', 'scale', 'rotation'])
+        ],
+        ann_file='pw3d_test.npz'),
+    val=dict(
+        type='HumanImageDataset',
+        body_model=dict(
+            type='GenderedSMPL',
+            keypoint_src='h36m',
+            keypoint_dst='h36m',
+            model_path='data/body_models/smpl',
+            joints_regressor='data/body_models/J_regressor_h36m.npy'),
+        dataset_name='pw3d',
+        data_prefix='data',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='GetRandomScaleRotation', rot_factor=0, scale_factor=0),
+            dict(type='MeshAffine', img_res=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(
+                type='ToTensor',
+                keys=[
+                    'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                    'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+                    'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+                ]),
+            dict(
+                type='Collect',
+                keys=[
+                    'img', 'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                    'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+                    'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+                ],
+                meta_keys=['image_path', 'center', 'scale', 'rotation'])
+        ],
+        ann_file='pw3d_test.npz'))
+work_dir = 'workspace/pare'
+gpu_ids = [4]
+
+2023-02-24 20:32:17,504 - mmhuman3d - INFO - initialize PoseHighResolutionNet with init_cfg {'type': 'Pretrained', 'checkpoint': 'data/pretrained_models/hrnet_pretrain.pth'}
+Name of parameter - Initialization information
+
+backbone.conv1.weight - torch.Size([64, 3, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.0.conv1.weight - torch.Size([64, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.0.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.0.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.0.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.0.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.0.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.0.conv3.weight - torch.Size([256, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.0.bn3.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.0.bn3.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.0.downsample.0.weight - torch.Size([256, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.0.downsample.1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.0.downsample.1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.1.conv1.weight - torch.Size([64, 256, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.1.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.1.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.1.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.1.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.1.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.1.conv3.weight - torch.Size([256, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.1.bn3.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.1.bn3.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.2.conv1.weight - torch.Size([64, 256, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.2.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.2.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.2.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.2.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.2.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.2.conv3.weight - torch.Size([256, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.2.bn3.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.2.bn3.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.3.conv1.weight - torch.Size([64, 256, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.3.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.3.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.3.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.3.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.3.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.3.conv3.weight - torch.Size([256, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.3.bn3.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.layer1.3.bn3.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.transition1.0.0.weight - torch.Size([32, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.transition1.0.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.transition1.0.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.transition1.1.0.0.weight - torch.Size([64, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.transition1.1.0.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.transition1.1.0.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.0.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.0.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.0.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.0.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.0.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.0.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.1.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.1.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.1.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.1.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.1.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.1.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.2.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.2.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.2.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.2.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.2.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.2.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.3.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.3.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.3.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.3.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.3.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.0.3.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.0.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.0.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.0.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.0.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.0.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.0.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.1.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.1.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.1.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.1.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.1.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.1.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.2.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.2.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.2.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.2.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.2.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.2.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.3.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.3.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.3.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.3.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.3.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.branches.1.3.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.fuse_layers.0.1.0.weight - torch.Size([32, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.fuse_layers.0.1.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.fuse_layers.0.1.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.fuse_layers.1.0.0.0.weight - torch.Size([64, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.fuse_layers.1.0.0.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage2.0.fuse_layers.1.0.0.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.transition2.2.0.0.weight - torch.Size([128, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.transition2.2.0.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.transition2.2.0.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.0.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.0.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.0.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.0.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.0.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.0.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.1.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.1.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.1.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.1.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.1.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.1.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.2.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.2.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.2.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.2.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.2.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.2.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.3.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.3.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.3.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.3.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.3.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.0.3.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.0.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.0.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.0.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.0.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.0.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.0.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.1.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.1.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.1.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.1.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.1.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.1.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.2.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.2.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.2.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.2.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.2.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.2.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.3.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.3.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.3.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.3.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.3.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.1.3.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.0.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.0.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.0.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.0.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.0.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.0.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.1.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.1.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.1.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.1.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.1.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.1.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.2.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.2.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.2.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.2.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.2.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.2.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.3.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.3.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.3.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.3.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.3.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.branches.2.3.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.0.1.0.weight - torch.Size([32, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.0.1.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.0.1.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.0.2.0.weight - torch.Size([32, 128, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.0.2.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.0.2.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.1.0.0.0.weight - torch.Size([64, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.1.0.0.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.1.0.0.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.1.2.0.weight - torch.Size([64, 128, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.1.2.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.1.2.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.2.0.0.0.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.2.0.0.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.2.0.0.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.2.0.1.0.weight - torch.Size([128, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.2.0.1.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.2.0.1.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.2.1.0.0.weight - torch.Size([128, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.2.1.0.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.0.fuse_layers.2.1.0.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.0.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.0.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.0.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.0.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.0.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.0.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.1.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.1.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.1.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.1.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.1.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.1.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.2.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.2.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.2.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.2.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.2.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.2.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.3.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.3.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.3.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.3.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.3.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.0.3.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.0.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.0.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.0.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.0.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.0.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.0.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.1.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.1.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.1.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.1.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.1.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.1.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.2.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.2.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.2.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.2.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.2.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.2.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.3.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.3.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.3.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.3.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.3.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.1.3.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.0.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.0.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.0.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.0.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.0.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.0.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.1.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.1.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.1.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.1.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.1.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.1.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.2.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.2.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.2.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.2.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.2.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.2.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.3.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.3.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.3.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.3.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.3.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.branches.2.3.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.0.1.0.weight - torch.Size([32, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.0.1.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.0.1.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.0.2.0.weight - torch.Size([32, 128, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.0.2.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.0.2.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.1.0.0.0.weight - torch.Size([64, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.1.0.0.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.1.0.0.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.1.2.0.weight - torch.Size([64, 128, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.1.2.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.1.2.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.2.0.0.0.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.2.0.0.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.2.0.0.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.2.0.1.0.weight - torch.Size([128, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.2.0.1.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.2.0.1.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.2.1.0.0.weight - torch.Size([128, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.2.1.0.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.1.fuse_layers.2.1.0.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.0.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.0.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.0.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.0.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.0.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.0.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.1.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.1.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.1.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.1.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.1.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.1.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.2.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.2.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.2.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.2.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.2.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.2.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.3.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.3.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.3.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.3.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.3.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.0.3.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.0.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.0.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.0.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.0.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.0.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.0.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.1.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.1.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.1.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.1.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.1.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.1.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.2.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.2.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.2.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.2.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.2.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.2.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.3.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.3.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.3.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.3.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.3.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.1.3.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.0.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.0.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.0.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.0.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.0.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.0.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.1.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.1.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.1.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.1.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.1.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.1.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.2.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.2.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.2.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.2.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.2.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.2.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.3.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.3.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.3.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.3.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.3.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.branches.2.3.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.0.1.0.weight - torch.Size([32, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.0.1.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.0.1.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.0.2.0.weight - torch.Size([32, 128, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.0.2.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.0.2.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.1.0.0.0.weight - torch.Size([64, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.1.0.0.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.1.0.0.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.1.2.0.weight - torch.Size([64, 128, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.1.2.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.1.2.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.2.0.0.0.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.2.0.0.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.2.0.0.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.2.0.1.0.weight - torch.Size([128, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.2.0.1.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.2.0.1.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.2.1.0.0.weight - torch.Size([128, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.2.1.0.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.2.fuse_layers.2.1.0.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.0.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.0.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.0.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.0.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.0.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.0.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.1.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.1.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.1.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.1.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.1.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.1.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.2.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.2.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.2.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.2.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.2.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.2.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.3.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.3.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.3.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.3.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.3.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.0.3.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.0.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.0.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.0.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.0.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.0.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.0.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.1.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.1.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.1.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.1.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.1.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.1.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.2.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.2.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.2.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.2.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.2.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.2.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.3.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.3.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.3.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.3.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.3.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.1.3.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.0.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.0.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.0.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.0.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.0.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.0.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.1.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.1.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.1.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.1.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.1.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.1.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.2.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.2.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.2.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.2.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.2.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.2.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.3.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.3.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.3.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.3.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.3.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.branches.2.3.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.0.1.0.weight - torch.Size([32, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.0.1.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.0.1.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.0.2.0.weight - torch.Size([32, 128, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.0.2.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.0.2.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.1.0.0.0.weight - torch.Size([64, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.1.0.0.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.1.0.0.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.1.2.0.weight - torch.Size([64, 128, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.1.2.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.1.2.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.2.0.0.0.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.2.0.0.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.2.0.0.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.2.0.1.0.weight - torch.Size([128, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.2.0.1.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.2.0.1.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.2.1.0.0.weight - torch.Size([128, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.2.1.0.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage3.3.fuse_layers.2.1.0.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.transition3.3.0.0.weight - torch.Size([256, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.transition3.3.0.1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.transition3.3.0.1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.0.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.0.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.0.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.0.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.0.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.0.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.1.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.1.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.1.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.1.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.1.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.1.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.2.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.2.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.2.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.2.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.2.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.2.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.3.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.3.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.3.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.3.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.3.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.0.3.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.0.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.0.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.0.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.0.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.0.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.0.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.1.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.1.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.1.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.1.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.1.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.1.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.2.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.2.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.2.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.2.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.2.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.2.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.3.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.3.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.3.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.3.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.3.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.1.3.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.0.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.0.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.0.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.0.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.0.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.0.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.1.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.1.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.1.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.1.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.1.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.1.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.2.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.2.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.2.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.2.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.2.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.2.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.3.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.3.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.3.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.3.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.3.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.2.3.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.0.conv1.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.0.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.0.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.0.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.0.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.0.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.1.conv1.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.1.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.1.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.1.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.1.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.1.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.2.conv1.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.2.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.2.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.2.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.2.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.2.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.3.conv1.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.3.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.3.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.3.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.3.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.branches.3.3.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.0.1.0.weight - torch.Size([32, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.0.1.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.0.1.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.0.2.0.weight - torch.Size([32, 128, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.0.2.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.0.2.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.0.3.0.weight - torch.Size([32, 256, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.0.3.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.0.3.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.1.0.0.0.weight - torch.Size([64, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.1.0.0.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.1.0.0.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.1.2.0.weight - torch.Size([64, 128, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.1.2.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.1.2.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.1.3.0.weight - torch.Size([64, 256, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.1.3.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.1.3.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.2.0.0.0.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.2.0.0.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.2.0.0.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.2.0.1.0.weight - torch.Size([128, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.2.0.1.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.2.0.1.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.2.1.0.0.weight - torch.Size([128, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.2.1.0.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.2.1.0.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.2.3.0.weight - torch.Size([128, 256, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.2.3.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.2.3.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.0.0.0.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.0.0.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.0.0.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.0.1.0.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.0.1.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.0.1.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.0.2.0.weight - torch.Size([256, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.0.2.1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.0.2.1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.1.0.0.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.1.0.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.1.0.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.1.1.0.weight - torch.Size([256, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.1.1.1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.1.1.1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.2.0.0.weight - torch.Size([256, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.2.0.1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.0.fuse_layers.3.2.0.1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.0.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.0.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.0.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.0.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.0.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.0.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.1.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.1.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.1.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.1.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.1.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.1.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.2.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.2.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.2.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.2.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.2.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.2.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.3.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.3.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.3.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.3.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.3.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.0.3.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.0.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.0.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.0.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.0.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.0.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.0.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.1.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.1.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.1.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.1.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.1.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.1.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.2.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.2.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.2.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.2.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.2.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.2.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.3.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.3.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.3.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.3.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.3.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.1.3.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.0.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.0.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.0.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.0.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.0.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.0.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.1.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.1.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.1.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.1.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.1.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.1.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.2.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.2.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.2.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.2.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.2.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.2.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.3.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.3.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.3.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.3.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.3.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.2.3.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.0.conv1.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.0.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.0.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.0.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.0.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.0.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.1.conv1.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.1.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.1.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.1.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.1.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.1.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.2.conv1.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.2.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.2.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.2.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.2.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.2.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.3.conv1.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.3.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.3.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.3.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.3.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.branches.3.3.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.0.1.0.weight - torch.Size([32, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.0.1.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.0.1.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.0.2.0.weight - torch.Size([32, 128, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.0.2.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.0.2.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.0.3.0.weight - torch.Size([32, 256, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.0.3.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.0.3.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.1.0.0.0.weight - torch.Size([64, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.1.0.0.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.1.0.0.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.1.2.0.weight - torch.Size([64, 128, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.1.2.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.1.2.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.1.3.0.weight - torch.Size([64, 256, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.1.3.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.1.3.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.2.0.0.0.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.2.0.0.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.2.0.0.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.2.0.1.0.weight - torch.Size([128, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.2.0.1.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.2.0.1.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.2.1.0.0.weight - torch.Size([128, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.2.1.0.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.2.1.0.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.2.3.0.weight - torch.Size([128, 256, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.2.3.1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.2.3.1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.0.0.0.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.0.0.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.0.0.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.0.1.0.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.0.1.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.0.1.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.0.2.0.weight - torch.Size([256, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.0.2.1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.0.2.1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.1.0.0.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.1.0.1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.1.0.1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.1.1.0.weight - torch.Size([256, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.1.1.1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.1.1.1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.2.0.0.weight - torch.Size([256, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.2.0.1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.1.fuse_layers.3.2.0.1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.0.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.0.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.0.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.0.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.0.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.0.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.1.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.1.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.1.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.1.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.1.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.1.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.2.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.2.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.2.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.2.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.2.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.2.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.3.conv1.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.3.bn1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.3.bn1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.3.conv2.weight - torch.Size([32, 32, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.3.bn2.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.0.3.bn2.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.0.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.0.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.0.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.0.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.0.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.0.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.1.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.1.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.1.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.1.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.1.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.1.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.2.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.2.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.2.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.2.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.2.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.2.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.3.conv1.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.3.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.3.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.3.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.3.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.1.3.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.0.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.0.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.0.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.0.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.0.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.0.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.1.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.1.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.1.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.1.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.1.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.1.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.2.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.2.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.2.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.2.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.2.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.2.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.3.conv1.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.3.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.3.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.3.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.3.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.2.3.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.0.conv1.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.0.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.0.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.0.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.0.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.0.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.1.conv1.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.1.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.1.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.1.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.1.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.1.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.2.conv1.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.2.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.2.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.2.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.2.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.2.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.3.conv1.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.3.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.3.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.3.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.3.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.branches.3.3.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.fuse_layers.0.1.0.weight - torch.Size([32, 64, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.fuse_layers.0.1.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.fuse_layers.0.1.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.fuse_layers.0.2.0.weight - torch.Size([32, 128, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.fuse_layers.0.2.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.fuse_layers.0.2.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.fuse_layers.0.3.0.weight - torch.Size([32, 256, 1, 1]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.fuse_layers.0.3.1.weight - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.fuse_layers.0.3.1.bias - torch.Size([32]): 
+PretrainedInit: load from data/pretrained_models/hrnet_pretrain.pth 
+
+backbone.stage4.2.fuse_layers.1.0.0.0.weight - torch.Size([64, 32, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.1.0.0.1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.1.0.0.1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.1.2.0.weight - torch.Size([64, 128, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.1.2.1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.1.2.1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.1.3.0.weight - torch.Size([64, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.1.3.1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.1.3.1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.2.0.0.0.weight - torch.Size([32, 32, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.2.0.0.1.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.2.0.0.1.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.2.0.1.0.weight - torch.Size([128, 32, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.2.0.1.1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.2.0.1.1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.2.1.0.0.weight - torch.Size([128, 64, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.2.1.0.1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.2.1.0.1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.2.3.0.weight - torch.Size([128, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.2.3.1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.2.3.1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.0.0.0.weight - torch.Size([32, 32, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.0.0.1.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.0.0.1.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.0.1.0.weight - torch.Size([32, 32, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.0.1.1.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.0.1.1.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.0.2.0.weight - torch.Size([256, 32, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.0.2.1.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.0.2.1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.1.0.0.weight - torch.Size([64, 64, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.1.0.1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.1.0.1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.1.1.0.weight - torch.Size([256, 64, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.1.1.1.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.1.1.1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.2.0.0.weight - torch.Size([256, 128, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.2.0.1.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.stage4.2.fuse_layers.3.2.0.1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.final_layer.weight - torch.Size([24, 32, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.final_layer.bias - torch.Size([24]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_2.1.weight - torch.Size([64, 64, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_2.2.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_2.2.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_3.1.weight - torch.Size([128, 128, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_3.2.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_3.2.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_3.5.weight - torch.Size([128, 128, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_3.6.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_3.6.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_4.1.weight - torch.Size([256, 256, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_4.2.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_4.2.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_4.5.weight - torch.Size([256, 256, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_4.6.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_4.6.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_4.9.weight - torch.Size([256, 256, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_4.10.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.upsample_stage_4.10.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.0.0.conv1.weight - torch.Size([32, 32, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.0.0.bn1.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.0.0.bn1.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.0.0.conv2.weight - torch.Size([32, 32, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.0.0.bn2.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.0.0.bn2.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.0.0.conv3.weight - torch.Size([128, 32, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.0.0.bn3.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.0.0.bn3.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.0.0.downsample.0.weight - torch.Size([128, 32, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.0.0.downsample.1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.0.0.downsample.1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.1.0.conv1.weight - torch.Size([64, 64, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.1.0.bn1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.1.0.bn1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.1.0.conv2.weight - torch.Size([64, 64, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.1.0.bn2.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.1.0.bn2.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.1.0.conv3.weight - torch.Size([256, 64, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.1.0.bn3.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.1.0.bn3.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.1.0.downsample.0.weight - torch.Size([256, 64, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.1.0.downsample.1.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.1.0.downsample.1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.2.0.conv1.weight - torch.Size([128, 128, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.2.0.bn1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.2.0.bn1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.2.0.conv2.weight - torch.Size([128, 128, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.2.0.bn2.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.2.0.bn2.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.2.0.conv3.weight - torch.Size([512, 128, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.2.0.bn3.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.2.0.bn3.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.2.0.downsample.0.weight - torch.Size([512, 128, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.2.0.downsample.1.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.2.0.downsample.1.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.3.0.conv1.weight - torch.Size([256, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.3.0.bn1.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.3.0.bn1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.3.0.conv2.weight - torch.Size([256, 256, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.3.0.bn2.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.3.0.bn2.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.3.0.conv3.weight - torch.Size([1024, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.3.0.bn3.weight - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.3.0.bn3.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.3.0.downsample.0.weight - torch.Size([1024, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.3.0.downsample.1.weight - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.incre_modules.3.0.downsample.1.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.downsamp_modules.0.0.weight - torch.Size([256, 128, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.downsamp_modules.0.0.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.downsamp_modules.0.1.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.downsamp_modules.0.1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.downsamp_modules.1.0.weight - torch.Size([512, 256, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.downsamp_modules.1.0.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.downsamp_modules.1.1.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.downsamp_modules.1.1.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.downsamp_modules.2.0.weight - torch.Size([1024, 512, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.downsamp_modules.2.0.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.downsamp_modules.2.1.weight - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.downsamp_modules.2.1.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.neck_layer.0.weight - torch.Size([2048, 1024, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.neck_layer.0.bias - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.neck_layer.1.weight - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+backbone.neck_layer.1.bias - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.keypoint_deconv_layers.0.weight - torch.Size([128, 480, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.keypoint_deconv_layers.1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.keypoint_deconv_layers.1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.keypoint_deconv_layers.3.weight - torch.Size([128, 128, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.keypoint_deconv_layers.4.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.keypoint_deconv_layers.4.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.smpl_deconv_layers.0.weight - torch.Size([128, 480, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.smpl_deconv_layers.1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.smpl_deconv_layers.1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.smpl_deconv_layers.3.weight - torch.Size([128, 128, 3, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.smpl_deconv_layers.4.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.smpl_deconv_layers.4.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.keypoint_final_layer.weight - torch.Size([25, 128, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.keypoint_final_layer.bias - torch.Size([25]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.smpl_final_layer.weight - torch.Size([64, 128, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.smpl_final_layer.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.shape_mlp.weight - torch.Size([10, 1536]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.shape_mlp.bias - torch.Size([10]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.cam_mlp.weight - torch.Size([3, 1536]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.cam_mlp.bias - torch.Size([3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+head.pose_mlp.weight - torch.Size([1, 6, 128, 24, 1, 1]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+body_model_train.betas - torch.Size([1, 10]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+body_model_train.global_orient - torch.Size([1, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+body_model_train.body_pose - torch.Size([1, 69]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+body_model_train.transl - torch.Size([1, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+body_model_test.betas - torch.Size([1, 10]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+body_model_test.global_orient - torch.Size([1, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+body_model_test.body_pose - torch.Size([1, 69]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+
+body_model_test.transl - torch.Size([1, 3]): 
+The value is the same before and after calling `init_weights` of ImageBodyModelEstimator  
+2023-02-24 20:32:33,355 - mmhuman3d - INFO - Start running, host: root@518b9ea961fb, work_dir: /workspaces/mmhuman3d/workspace/pare
+2023-02-24 20:32:33,356 - mmhuman3d - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) FixedLrUpdaterHook                 
+(NORMAL      ) CheckpointHook                     
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) FixedLrUpdaterHook                 
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) FixedLrUpdaterHook                 
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2023-02-24 20:32:33,358 - mmhuman3d - INFO - workflow: [('train', 1)], max: 200 epochs
+2023-02-24 20:32:33,359 - mmhuman3d - INFO - Checkpoints will be saved to /workspaces/mmhuman3d/workspace/pare by HardDiskBackend.

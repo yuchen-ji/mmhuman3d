@@ -1,5 +1,5 @@
 checkpoint_config = dict(interval=1)
-log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+log_config = dict(interval=50, hooks=[dict(type='TensorboardLoggerHook')])
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 load_from = None
@@ -418,4 +418,4 @@ data = dict(
         ],
         ann_file='pw3d_test.npz'))
 work_dir = 'workspace/hmr'
-gpu_ids = range(0, 1)
+gpu_ids = range(0, 4)

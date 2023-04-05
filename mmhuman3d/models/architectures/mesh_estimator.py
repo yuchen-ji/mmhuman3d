@@ -783,6 +783,10 @@ class ImageBodyModelEstimator(BodyModelEstimator):
             features = self.backbone(img)
         else:
             features = kwargs['features']
+        
+        # By Yuchen, 23.02.27, if feature is list, which causes by multitask branch 
+        if isinstance(features, list):
+            features = features[0]
 
         if self.neck is not None:
             features = self.neck(features)

@@ -30,6 +30,8 @@ from .transforms import (
     RandomHorizontalFlip,
     Rotation,
     SimulateLowRes,
+    # By Yuchen, 23.02.25
+    RandomCrop,
 )
 
 __all__ = [
@@ -60,4 +62,5 @@ __all__ = [
     'SyntheticOcclusion',
     'BBoxCenterJitter',
     'SimulateLowRes',
+    'RandomCrop'
 ]

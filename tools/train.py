@@ -39,7 +39,8 @@ def parse_args():
     group_gpus.add_argument(
         '--gpu-ids',
         type=int,
-        default=[4],
+        # default=[4],
+        # default=[4, 5, 6, 7],
         nargs='+',
         help='ids of gpus to use '
         '(only applicable to non-distributed training)')

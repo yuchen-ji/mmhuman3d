@@ -951,3 +951,46 @@ class SimulateLowRes(object):
         results['img'] = img
 
         return results
+
+
+@PIPELINES.register_module()
+class RandomCrop(object):
+    """ By Yuchen, 23.02.26
+        add crop image function, resize bbox using keypoints
+        we adjust the size of the bounding box to make parts below the pelvis invisible
+    """
+    def __init__(self, crop_prob=0.5):
+        assert 0 <= crop_prob <= 1
+        self.crop_prob = crop_prob
+        self.pelvis = {
+            'pelvis' :  0,
+            'pelvis_extra' : 49,
+            'left_hip' : 1,
+            'right_hip' : 2,
+            'right_hip_extra' : 45,
+            'left_hip_extra' : 46,
+            'spine_extra' : 51,
+        }
+        
+    def __call__(self, results):
+        if np.random.rand() > self.crop_prob:
+            results['is_cropped'] = 1
+            return results
+                
+        if 'keypoints2d' in results:
+            keypoints2d = results['keypoints2d'].copy()
+            x, y, w, h, s = results['bbox_xywh'].copy()
+            for k, v in self.pelvis.items():
+                if keypoints2d[v,2] == 1:
+                    y2 = keypoints2d[v,1] + 0.3 * (y+h-keypoints2d[v,1])
+                    h = y2 -y
+                    cx = x + w/2
+                    cy = y + h/2
+                    w = h = max(w, h)
+                    # results['bbox_xywh'] = np.array([x, y, w, h]), bbox 这个变量一直都没有修改
+                    results['center'] = np.array([cx, cy])
+                    results['scale'] = np.array([w, h])
+                    results['is_cropped'] = 1
+                    break
+        
+        return results

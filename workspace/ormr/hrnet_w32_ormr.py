@@ -1,17 +1,17 @@
 checkpoint_config = dict(interval=1)
-log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+log_config = dict(
+    interval=50,
+    hooks=[dict(type='TextLoggerHook'),
+           dict(type='TensorboardLoggerHook')])
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 load_from = None
-resume_from = None
+resume_from = 'workspace/ormr/epoch6_wo_crop/epoch_6.pth'
 workflow = [('train', 1)]
 use_adversarial_train = True
-evaluation = dict(interval=10, metric=['pa-mpjpe', 'mpjpe'])
 img_res = 224
 optimizer = dict(
-    backbone=dict(type='Adam', lr=0.0002),
-    head=dict(type='Adam', lr=0.0002),
-    disc=dict(type='Adam', lr=0.0001))
+    backbone=dict(type='Adam', lr=0.0001), head=dict(type='Adam', lr=0.0001))
 optimizer_config = dict(grad_clip=None)
 lr_config = dict(policy='Fixed', by_epoch=False)
 runner = dict(type='EpochBasedRunner', max_epochs=200)
@@ -114,14 +114,7 @@ model = dict(
     loss_vertex=dict(type='L1Loss', loss_weight=2),
     loss_smpl_pose=dict(type='MSELoss', loss_weight=3),
     loss_smpl_betas=dict(type='MSELoss', loss_weight=0.02),
-    loss_adv=dict(
-        type='GANLoss',
-        gan_type='lsgan',
-        real_label_val=1.0,
-        fake_label_val=0.0,
-        loss_weight=1),
-    disc=dict(type='SMPLDiscriminator'),
-    loss_heatmap2d=dict(type='HeatmapMSELoss'))
+    loss_heatmap2d=dict(type='HeatmapMSELoss', loss_weight=300))
 dataset_type = 'HumanImageDataset'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
@@ -131,6 +124,7 @@ data_keys = [
 ]
 train_pipeline = [
     dict(type='LoadImageFromFile'),
+    dict(type='RandomCrop', crop_prob=0.5),
     dict(type='RandomChannelNoise', noise_factor=0.4),
     dict(type='RandomHorizontalFlip', flip_prob=0.5, convention='smpl_54'),
     dict(type='GetRandomScaleRotation', rot_factor=30, scale_factor=0.25),
@@ -219,6 +213,7 @@ data = dict(
                     data_prefix='data',
                     pipeline=[
                         dict(type='LoadImageFromFile'),
+                        dict(type='RandomCrop', crop_prob=0.5),
                         dict(type='RandomChannelNoise', noise_factor=0.4),
                         dict(
                             type='RandomHorizontalFlip',
@@ -259,10 +254,56 @@ data = dict(
                     ann_file='h36m_train.npz'),
                 dict(
                     type='HumanImageDataset',
+                    dataset_name='mpi_inf_3dhp',
+                    data_prefix='data',
+                    pipeline=[
+                        dict(type='LoadImageFromFile'),
+                        dict(type='RandomCrop', crop_prob=0.5),
+                        dict(type='RandomChannelNoise', noise_factor=0.4),
+                        dict(
+                            type='RandomHorizontalFlip',
+                            flip_prob=0.5,
+                            convention='smpl_54'),
+                        dict(
+                            type='GetRandomScaleRotation',
+                            rot_factor=30,
+                            scale_factor=0.25),
+                        dict(type='MeshAffine', img_res=224),
+                        dict(
+                            type='Normalize',
+                            mean=[123.675, 116.28, 103.53],
+                            std=[58.395, 57.12, 57.375],
+                            to_rgb=True),
+                        dict(type='ImageToTensor', keys=['img']),
+                        dict(
+                            type='ToTensor',
+                            keys=[
+                                'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ]),
+                        dict(
+                            type='Collect',
+                            keys=[
+                                'img', 'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ],
+                            meta_keys=[
+                                'image_path', 'center', 'scale', 'rotation'
+                            ])
+                    ],
+                    convention='smpl_54',
+                    ann_file='mpi_inf_3dhp_train.npz'),
+                dict(
+                    type='HumanImageDataset',
                     dataset_name='lsp',
                     data_prefix='data',
                     pipeline=[
                         dict(type='LoadImageFromFile'),
+                        dict(type='RandomCrop', crop_prob=0.5),
                         dict(type='RandomChannelNoise', noise_factor=0.4),
                         dict(
                             type='RandomHorizontalFlip',
@@ -307,6 +348,7 @@ data = dict(
                     data_prefix='data',
                     pipeline=[
                         dict(type='LoadImageFromFile'),
+                        dict(type='RandomCrop', crop_prob=0.5),
                         dict(type='RandomChannelNoise', noise_factor=0.4),
                         dict(
                             type='RandomHorizontalFlip',
@@ -351,6 +393,7 @@ data = dict(
                     data_prefix='data',
                     pipeline=[
                         dict(type='LoadImageFromFile'),
+                        dict(type='RandomCrop', crop_prob=0.5),
                         dict(type='RandomChannelNoise', noise_factor=0.4),
                         dict(
                             type='RandomHorizontalFlip',
@@ -395,6 +438,7 @@ data = dict(
                     data_prefix='data',
                     pipeline=[
                         dict(type='LoadImageFromFile'),
+                        dict(type='RandomCrop', crop_prob=0.5),
                         dict(type='RandomChannelNoise', noise_factor=0.4),
                         dict(
                             type='RandomHorizontalFlip',
@@ -486,5 +530,5 @@ data = dict(
                 meta_keys=['image_path', 'center', 'scale', 'rotation'])
         ],
         ann_file='pw3d_test.npz'))
-work_dir = 'workspace/ormr'
-gpu_ids = [4]
+work_dir = 'workspace/ormr/'
+gpu_ids = range(0, 4)

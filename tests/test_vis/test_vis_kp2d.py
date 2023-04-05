@@ -239,3 +239,9 @@ def test_vis_kp2d():
         resolution=(1000, 1000),
     )
     assert images_to_array(output_folder).shape
+
+
+if __name__ =='__main__':
+    import torch
+    data = np.load('demo_result/inference_result.npz', allow_pickle=True)
+    smpl_data = data['smpl'].item()
