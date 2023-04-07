@@ -531,4 +531,4 @@ data = dict(
         ],
         ann_file='pw3d_test.npz'))
 work_dir = 'workspace/ormr'
-gpu_ids = range(0, 1)
+gpu_ids = range(0, 4)

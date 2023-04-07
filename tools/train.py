@@ -19,7 +19,7 @@ from mmhuman3d.utils.logger import get_root_logger
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a model')
-    parser.add_argument('--config', default='configs/ormr/hrnet_w32_ormr.py', help='train config file path')
+    parser.add_argument('--config', default='configs/ormr/hrnet_w32_ormr_w_htmp_wo_crop_adv.py', help='train config file path')
     parser.add_argument('--work-dir', default='workspace/ormr', help='the dir to save logs and models')
     parser.add_argument(
         '--resume-from', help='the checkpoint file to resume from')

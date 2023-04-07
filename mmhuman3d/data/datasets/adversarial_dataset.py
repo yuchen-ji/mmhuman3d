@@ -3,6 +3,7 @@ from torch.utils.data import Dataset
 
 from .builder import DATASETS, build_dataset
 import torch
+import cv2
 
 # 20.02.18, add 2d keypoints heatmap
 def gen_heatmap(heatmap_size, image_size, joints):
@@ -91,6 +92,16 @@ class AdversarialDataset(Dataset):
         image_size = np.array([data['img'].shape[1], data['img'].shape[2]])
         joints = data['keypoints2d'][:].numpy()
         heatmap, heatmap_conf = gen_heatmap(heatmap_size, image_size, joints)
+
+        # # visualize heatmap, By Yuchen, 23.04.08, 生成的heatmap和图中的关键点位置符合
+        # tmpmap = np.mean(heatmap, axis=0)
+        # am = np.amax(tmpmap)
+        # tmpmap /= am / 255
+        # tmpmap = cv2.applyColorMap(np.uint8(tmpmap), cv2.COLORMAP_HSV)
+        # cv2.imwrite('/workspaces/mmhuman3d/workspace/demo/222.png', tmpmap)
+        # img_data = data['img'].numpy() * 255
+        # cv2.imwrite('/workspaces/mmhuman3d/workspace/demo/gt.png', img_data.transpose(1,2,0))
+
         data['heatmap2d'] = torch.from_numpy(heatmap).float()
         data['heatmap2d_conf'] = torch.from_numpy(heatmap_conf)
         
