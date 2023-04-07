@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 import mmcv
+import pickle
 
 def process_h36m(dirname):
     split = ['S1', "S5", "S6", "S7", "S8", "S9", "S11"]
@@ -72,7 +73,8 @@ def gen_heatmap(heatmap_size, image_size, joints):
                 
     return target, target_conf
         
-            
+def img2video():
+    mmcv.frames2video('workspace/demo/input_results', 'test.avi', fps=10, filename_tmpl='{:06d}.png')
 
 if __name__ == "__main__":
     # dirname = 'data/datasets/h36m'
@@ -83,7 +85,12 @@ if __name__ == "__main__":
     # image_size = np.array([128, 128])
     # heatmap = gen_heatmap(heatmap_size, image_size, joints)
     
-    data = np.load('data/preprocessed_datasets/pw3d_test.npz', allow_pickle=True)
-    smpl = data['smpl']
-    image_path = data['image_path']
-    print(data)
+    # data = np.load('data/preprocessed_datasets/pw3d_test.npz', allow_pickle=True)
+    # smpl = data['smpl']
+    # image_path = data['image_path']
+    
+    # with open('data/datasets/pw3d/sequenceFiles/test/downtown_arguing_00.pkl', 'rb') as f:
+    #     data = pickle.load(f)
+    # print(data)
+    
+    img2video()

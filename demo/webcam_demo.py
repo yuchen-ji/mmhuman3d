@@ -38,14 +38,18 @@ def parse_args():
     parser.add_argument(
         '--mesh_reg_config',
         type=str,
-        default='configs/pare/hrnet_w32_conv_pare_coco.py',
+        # default='configs/pare/hrnet_w32_conv_pare_coco.py',
+        default='configs/ormr/hrnet_w32_ormr.py',
         help='Config file for mesh regression')
     parser.add_argument(
         '--mesh_reg_checkpoint',
         type=str,
-        default='data/checkpoints/hrnet_w32_conv_pare_mosh.pth',
+        # default='data/checkpoints/hrnet_w32_conv_pare_mosh.pth',
+        default='workspace/ormr/epoch6_wo_crop/epoch_6.pth',
         help='Checkpoint file for mesh regression')
-    parser.add_argument('--cam-id', type=str, default='0')
+    parser.add_argument('--cam-id', type=str, 
+                        # default='0'
+                        default='workspace/demo/input.mp4')
     parser.add_argument(
         '--det_config',
         type=str,
@@ -66,7 +70,7 @@ def parse_args():
         help='Category id for bounding box detection model. '
         'Default: 1 for human')
     parser.add_argument(
-        '--device', default='cuda:0', help='Device used for inference')
+        '--device', default='cuda:4', help='Device used for inference')
     parser.add_argument(
         '--body_model_dir',
         type=str,
@@ -85,12 +89,12 @@ def parse_args():
     parser.add_argument(
         '--out_video_fps',
         type=int,
-        default=20,
+        default=10,
         help='Set the FPS of the output video file.')
     parser.add_argument(
         '--input_video_fps',
         type=int,
-        default=30,
+        default=10,
         help='The FPS of the input video file.')
     parser.add_argument(
         '--buffer_size',
@@ -363,7 +367,6 @@ def main():
         args.det_config, args.det_checkpoint, device=args.device.lower())
 
     # build human3d models
-
     mesh_model, extractor = init_model(
         args.mesh_reg_config,
         args.mesh_reg_checkpoint,
