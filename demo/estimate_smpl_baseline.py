@@ -15,7 +15,7 @@ from mmhuman3d.apis import (
     inference_video_based_model,
     init_model,
 )
-from mmhuman3d.core.visualization.visualize_smpl import visualize_smpl_hmr, visualize_smpl_pose
+from mmhuman3d.core.visualization.visualize_smpl import visualize_smpl_hmr, visualize_smpl_pose, visualize_T_pose
 from mmhuman3d.data.data_structures.human_data import HumanData
 from mmhuman3d.utils.demo_utils import (
     extract_feature_sequence,
@@ -294,7 +294,8 @@ def single_person_with_mmdet(args, frames_iter):
             betas=smpl_betas,
             body_model_config=body_model_config,
             output_path='workspace/demo/smpl',
-            resolution=(1024, 1024))
+            resolution=(1024, 1024))            
+        
         if args.output is None:
             shutil.rmtree(frames_folder)
 
@@ -508,17 +509,16 @@ if __name__ == '__main__':
     parser.add_argument(
         '--mesh_reg_config',
         type=str,
-        # default='configs/pare/hrnet_w32_conv_pare_coco.py',
+        default='configs/pare/hrnet_w32_conv_pare_coco.py',
+        # default='configs/ormr/hrnet_w32_ormr_w_htmp_crop_wo_adv.py',
         # default='configs/hmr/resnet50_hmr_pw3d.py',
-        default='configs/ormr/hrnet_w32_ormr_w_htmp_crop_wo_adv.py',
         help='Config file for mesh regression')
     parser.add_argument(
         '--mesh_reg_checkpoint',
         type=str,
-        default='workspace/ormr/epoch7_w_htmp_crop_wo_adv/epoch_7.pth',
-        # default='data/checkpoints/hrnet_w32_conv_pare_mosh.pth',
+        default='data/checkpoints/hrnet_w32_conv_pare_mosh.pth',
+        # default='workspace/ormr/epoch7_w_htmp_crop_wo_adv/epoch_7.pth',
         # default='data/checkpoints/resnet50_hmr_pw3d.pth',
-        # default='workspace/hmr/epoch_2.pth',
         help='Checkpoint file for mesh regression')
     parser.add_argument(
         '--single_person_demo',
@@ -549,8 +549,8 @@ if __name__ == '__main__':
         default='data/body_models/',
         help='Body models file path')
     parser.add_argument(
-        '--input_path', type=str, default='workspace/demo/image_00000.jpg', help='Input path')
-        # '--input_path', type=str, default='workspace/demo/input.mp4', help='Input path')
+        # '--input_path', type=str, default='workspace/demo/image_00000.jpg', help='Input path')
+        '--input_path', type=str, default='workspace/demo/input.mp4', help='Input path')
         # '--input_path', type=str, default='workspace/demo/1.png', help='Input path')
     parser.add_argument(
         '--output',

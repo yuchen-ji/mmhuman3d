@@ -509,16 +509,18 @@ if __name__ == '__main__':
     parser.add_argument(
         '--mesh_reg_config',
         type=str,
-        default='workspace/ormr/hrnet_w32_ormr_w_htmp_wo_crop_adv.py',
+        # default='configs/pare/hrnet_w32_conv_pare_coco.py',
+        default='configs/hmr/resnet50_hmr_pw3d.py',
+        # default='configs/ormr/hrnet_w32_ormr_w_htmp_crop_wo_adv.py',
+        # default='configs/ormr/hrnet_w32_ormr_w_htmp_crop_adv.py',
         help='Config file for mesh regression')
     parser.add_argument(
         '--mesh_reg_checkpoint',
         type=str,
-        default='workspace/ormr/epoch_2.pth',
-        # default='workspace/ormr/epoch6_wo_crop/epoch_6.pth',
-        # default='workspace/ormr/epoch_1.pth',
+        # default='data/checkpoints/hrnet_w32_conv_pare.pth',
+        default='data/checkpoints/resnet50_hmr_pw3d.pth',
         # default='workspace/ormr/epoch7_w_htmp_crop_wo_adv/epoch_7.pth',
-        # default='workspace/hmr/epoch_2.pth',
+        # default='workspace/ormr/epoch7_w_htmp_crop_adv/epoch_1.pth',
         help='Checkpoint file for mesh regression')
     parser.add_argument(
         '--single_person_demo',
@@ -561,7 +563,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--show_path',
         type=str,
-        default='workspace/demo/input_result.mp4',
+        default='workspace/demo/input_hmr.mp4',
         help='directory to save rendered images or video')
     parser.add_argument(
         '--render_choice',

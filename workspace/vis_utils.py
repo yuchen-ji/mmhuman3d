@@ -78,19 +78,6 @@ def frame_extraction(video_path, short_side):
         flag, frame = vid.read()
 
     return frame_paths, frames
-
-
-def vis_heatmap():
-    index = 0
-    fname = 'data/datasets/pw3d/sequenceFiles/test/downtown_arguing_00.pkl'
-    with open(fname, 'rb') as f:
-        context = pk.load(f, encoding='latin1')
-    poses2d = context['poses2d'][0][index, :]
-    print(poses2d)
-    
-    imagefile = f'data/datasets/pw3d/imageFiles/downtown_arguing_00/image_{str(index).zfill(5)}.jpg'
-    img = mmcv.imread(imagefile)
-    # mmcv.imshow(img)
     
 
 if __name__ == '__main__':
@@ -102,7 +89,5 @@ if __name__ == '__main__':
     # vis_pose_2d(context)
     
     # vname = 'workspace/demo/rviz_1.mp4'
-    # vname = 'workspace/demo/input_results_2.mp4'
-    # frame_extraction(vname, 480)
-    
-    vis_heatmap()
+    vname = 'workspace/demo/input_hmr.mp4'
+    frame_extraction(vname, 480)
