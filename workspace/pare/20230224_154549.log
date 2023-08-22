@@ -1,0 +1,538 @@
+2023-02-24 15:45:50,757 - mmhuman3d - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.16 (default, Jan 17 2023, 23:13:24) [GCC 11.2.0]
+CUDA available: True
+GPU 0,1,2,3,4,5,6,7: NVIDIA TITAN RTX
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 11.0, V11.0.221
+GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+PyTorch: 1.8.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2021.4-Product Build 20210904 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.7.0 (Git Hash 7aed236906b1f7a05c0917e5257a1af05e9ff683)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 10.2
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_37,code=compute_37
+  - CuDNN 7.6.5
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=10.2, CUDNN_VERSION=7.6.5, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.8.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+TorchVision: 0.9.0
+OpenCV: 4.7.0
+MMCV: 1.5.3
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 10.2
+MMHuman3d: 0.10.0+32fb6c7
+------------------------------------------------------------
+
+2023-02-24 15:45:50,758 - mmhuman3d - INFO - Distributed training: False
+2023-02-24 15:45:52,238 - mmhuman3d - INFO - Config:
+checkpoint_config = dict(interval=6)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+use_adversarial_train = True
+evaluation = dict(interval=6, metric=['pa-mpjpe', 'mpjpe'])
+img_res = 224
+optimizer = dict(
+    backbone=dict(type='Adam', lr=5e-05), head=dict(type='Adam', lr=5e-05))
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(policy='Fixed', by_epoch=False)
+runner = dict(type='EpochBasedRunner', max_epochs=50)
+width = 32
+downsample = False
+use_conv = True
+hrnet_extra = dict(
+    stage1=dict(
+        num_modules=1,
+        num_branches=1,
+        block='BOTTLENECK',
+        num_blocks=(4, ),
+        num_channels=(64, )),
+    stage2=dict(
+        num_modules=1,
+        num_branches=2,
+        block='BASIC',
+        num_blocks=(4, 4),
+        num_channels=(32, 64)),
+    stage3=dict(
+        num_modules=4,
+        num_branches=3,
+        block='BASIC',
+        num_blocks=(4, 4, 4),
+        num_channels=(32, 64, 128)),
+    stage4=dict(
+        num_modules=3,
+        num_branches=4,
+        block='BASIC',
+        num_blocks=(4, 4, 4, 4),
+        num_channels=(32, 64, 128, 256)),
+    downsample=False,
+    use_conv=True,
+    pretrained_layers=[
+        'conv1', 'bn1', 'conv2', 'bn2', 'layer1', 'transition1', 'stage2',
+        'transition2', 'stage3', 'transition3', 'stage4'
+    ],
+    final_conv_kernel=1,
+    return_list=False)
+find_unused_parameters = True
+model = dict(
+    type='ImageBodyModelEstimator',
+    backbone=dict(
+        type='PoseHighResolutionNet',
+        extra=dict(
+            stage1=dict(
+                num_modules=1,
+                num_branches=1,
+                block='BOTTLENECK',
+                num_blocks=(4, ),
+                num_channels=(64, )),
+            stage2=dict(
+                num_modules=1,
+                num_branches=2,
+                block='BASIC',
+                num_blocks=(4, 4),
+                num_channels=(32, 64)),
+            stage3=dict(
+                num_modules=4,
+                num_branches=3,
+                block='BASIC',
+                num_blocks=(4, 4, 4),
+                num_channels=(32, 64, 128)),
+            stage4=dict(
+                num_modules=3,
+                num_branches=4,
+                block='BASIC',
+                num_blocks=(4, 4, 4, 4),
+                num_channels=(32, 64, 128, 256)),
+            downsample=False,
+            use_conv=True,
+            pretrained_layers=[
+                'conv1', 'bn1', 'conv2', 'bn2', 'layer1', 'transition1',
+                'stage2', 'transition2', 'stage3', 'transition3', 'stage4'
+            ],
+            final_conv_kernel=1,
+            return_list=False),
+        num_joints=24),
+    head=dict(
+        type='PareHead',
+        num_joints=24,
+        num_input_features=480,
+        smpl_mean_params='data/body_models/smpl_mean_params.npz',
+        num_deconv_layers=2,
+        num_deconv_filters=[128, 128],
+        num_deconv_kernels=[4, 4],
+        use_heatmaps='part_segm',
+        use_keypoint_attention=True,
+        backbone='hrnet_w32-conv'),
+    body_model_train=dict(
+        type='SMPL',
+        keypoint_src='smpl_54',
+        keypoint_dst='smpl_24',
+        model_path='data/body_models/smpl',
+        keypoint_approximate=True,
+        extra_joints_regressor='data/body_models/J_regressor_extra.npy'),
+    body_model_test=dict(
+        type='SMPL',
+        keypoint_src='h36m',
+        keypoint_dst='h36m',
+        model_path='data/body_models/smpl',
+        joints_regressor='data/body_models/J_regressor_h36m.npy'),
+    convention='smpl_24',
+    loss_keypoints3d=dict(type='MSELoss', loss_weight=300),
+    loss_keypoints2d=dict(type='MSELoss', loss_weight=150),
+    loss_smpl_pose=dict(type='MSELoss', loss_weight=60),
+    loss_smpl_betas=dict(type='MSELoss', loss_weight=0.06),
+    loss_camera=dict(type='CameraPriorLoss', loss_weight=1),
+    init_cfg=dict(
+        type='Pretrained',
+        checkpoint='data/pretrained_models/hrnet_w32_conv_pare_coco.pth'))
+dataset_type = 'HumanImageDataset'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+data_keys = [
+    'has_smpl', 'has_keypoints3d', 'has_keypoints2d', 'smpl_body_pose',
+    'smpl_global_orient', 'smpl_betas', 'smpl_transl', 'keypoints2d',
+    'keypoints3d', 'sample_idx'
+]
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='RandomChannelNoise', noise_factor=0.4),
+    dict(type='RandomHorizontalFlip', flip_prob=0.5, convention='smpl_24'),
+    dict(type='GetRandomScaleRotation', rot_factor=30, scale_factor=0.25),
+    dict(type='MeshAffine', img_res=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(
+        type='ToTensor',
+        keys=[
+            'has_smpl', 'has_keypoints3d', 'has_keypoints2d', 'smpl_body_pose',
+            'smpl_global_orient', 'smpl_betas', 'smpl_transl', 'keypoints2d',
+            'keypoints3d', 'sample_idx'
+        ]),
+    dict(
+        type='Collect',
+        keys=[
+            'img', 'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+            'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+            'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+        ],
+        meta_keys=['image_path', 'center', 'scale', 'rotation'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='GetRandomScaleRotation', rot_factor=0, scale_factor=0),
+    dict(type='MeshAffine', img_res=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(
+        type='ToTensor',
+        keys=[
+            'has_smpl', 'has_keypoints3d', 'has_keypoints2d', 'smpl_body_pose',
+            'smpl_global_orient', 'smpl_betas', 'smpl_transl', 'keypoints2d',
+            'keypoints3d', 'sample_idx'
+        ]),
+    dict(
+        type='Collect',
+        keys=[
+            'img', 'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+            'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+            'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+        ],
+        meta_keys=['image_path', 'center', 'scale', 'rotation'])
+]
+inference_pipeline = [
+    dict(type='MeshAffine', img_res=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(
+        type='Collect',
+        keys=['img', 'sample_idx'],
+        meta_keys=['image_path', 'center', 'scale', 'rotation'])
+]
+data = dict(
+    samples_per_gpu=32,
+    workers_per_gpu=0,
+    train=dict(
+        type='MixedDataset',
+        configs=[
+            dict(
+                type='HumanImageDataset',
+                dataset_name='h36m',
+                data_prefix='data',
+                pipeline=[
+                    dict(type='LoadImageFromFile'),
+                    dict(type='RandomChannelNoise', noise_factor=0.4),
+                    dict(
+                        type='RandomHorizontalFlip',
+                        flip_prob=0.5,
+                        convention='smpl_24'),
+                    dict(
+                        type='GetRandomScaleRotation',
+                        rot_factor=30,
+                        scale_factor=0.25),
+                    dict(type='MeshAffine', img_res=224),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(
+                        type='ToTensor',
+                        keys=[
+                            'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                            'smpl_body_pose', 'smpl_global_orient',
+                            'smpl_betas', 'smpl_transl', 'keypoints2d',
+                            'keypoints3d', 'sample_idx'
+                        ]),
+                    dict(
+                        type='Collect',
+                        keys=[
+                            'img', 'has_smpl', 'has_keypoints3d',
+                            'has_keypoints2d', 'smpl_body_pose',
+                            'smpl_global_orient', 'smpl_betas', 'smpl_transl',
+                            'keypoints2d', 'keypoints3d', 'sample_idx'
+                        ],
+                        meta_keys=[
+                            'image_path', 'center', 'scale', 'rotation'
+                        ])
+                ],
+                convention='smpl_24',
+                ann_file='h36m_train.npz'),
+            dict(
+                type='HumanImageDataset',
+                dataset_name='coco',
+                data_prefix='data',
+                pipeline=[
+                    dict(type='LoadImageFromFile'),
+                    dict(type='RandomChannelNoise', noise_factor=0.4),
+                    dict(
+                        type='RandomHorizontalFlip',
+                        flip_prob=0.5,
+                        convention='smpl_24'),
+                    dict(
+                        type='GetRandomScaleRotation',
+                        rot_factor=30,
+                        scale_factor=0.25),
+                    dict(type='MeshAffine', img_res=224),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(
+                        type='ToTensor',
+                        keys=[
+                            'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                            'smpl_body_pose', 'smpl_global_orient',
+                            'smpl_betas', 'smpl_transl', 'keypoints2d',
+                            'keypoints3d', 'sample_idx'
+                        ]),
+                    dict(
+                        type='Collect',
+                        keys=[
+                            'img', 'has_smpl', 'has_keypoints3d',
+                            'has_keypoints2d', 'smpl_body_pose',
+                            'smpl_global_orient', 'smpl_betas', 'smpl_transl',
+                            'keypoints2d', 'keypoints3d', 'sample_idx'
+                        ],
+                        meta_keys=[
+                            'image_path', 'center', 'scale', 'rotation'
+                        ])
+                ],
+                convention='smpl_24',
+                ann_file='eft_coco_all.npz'),
+            dict(
+                type='HumanImageDataset',
+                dataset_name='lspet',
+                data_prefix='data',
+                pipeline=[
+                    dict(type='LoadImageFromFile'),
+                    dict(type='RandomChannelNoise', noise_factor=0.4),
+                    dict(
+                        type='RandomHorizontalFlip',
+                        flip_prob=0.5,
+                        convention='smpl_24'),
+                    dict(
+                        type='GetRandomScaleRotation',
+                        rot_factor=30,
+                        scale_factor=0.25),
+                    dict(type='MeshAffine', img_res=224),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(
+                        type='ToTensor',
+                        keys=[
+                            'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                            'smpl_body_pose', 'smpl_global_orient',
+                            'smpl_betas', 'smpl_transl', 'keypoints2d',
+                            'keypoints3d', 'sample_idx'
+                        ]),
+                    dict(
+                        type='Collect',
+                        keys=[
+                            'img', 'has_smpl', 'has_keypoints3d',
+                            'has_keypoints2d', 'smpl_body_pose',
+                            'smpl_global_orient', 'smpl_betas', 'smpl_transl',
+                            'keypoints2d', 'keypoints3d', 'sample_idx'
+                        ],
+                        meta_keys=[
+                            'image_path', 'center', 'scale', 'rotation'
+                        ])
+                ],
+                convention='smpl_24',
+                ann_file='eft_lspet.npz'),
+            dict(
+                type='HumanImageDataset',
+                dataset_name='mpii',
+                data_prefix='data',
+                pipeline=[
+                    dict(type='LoadImageFromFile'),
+                    dict(type='RandomChannelNoise', noise_factor=0.4),
+                    dict(
+                        type='RandomHorizontalFlip',
+                        flip_prob=0.5,
+                        convention='smpl_24'),
+                    dict(
+                        type='GetRandomScaleRotation',
+                        rot_factor=30,
+                        scale_factor=0.25),
+                    dict(type='MeshAffine', img_res=224),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(
+                        type='ToTensor',
+                        keys=[
+                            'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                            'smpl_body_pose', 'smpl_global_orient',
+                            'smpl_betas', 'smpl_transl', 'keypoints2d',
+                            'keypoints3d', 'sample_idx'
+                        ]),
+                    dict(
+                        type='Collect',
+                        keys=[
+                            'img', 'has_smpl', 'has_keypoints3d',
+                            'has_keypoints2d', 'smpl_body_pose',
+                            'smpl_global_orient', 'smpl_betas', 'smpl_transl',
+                            'keypoints2d', 'keypoints3d', 'sample_idx'
+                        ],
+                        meta_keys=[
+                            'image_path', 'center', 'scale', 'rotation'
+                        ])
+                ],
+                convention='smpl_24',
+                ann_file='eft_mpii.npz'),
+            dict(
+                type='HumanImageDataset',
+                dataset_name='mpi_inf_3dhp',
+                data_prefix='data',
+                pipeline=[
+                    dict(type='LoadImageFromFile'),
+                    dict(type='RandomChannelNoise', noise_factor=0.4),
+                    dict(
+                        type='RandomHorizontalFlip',
+                        flip_prob=0.5,
+                        convention='smpl_24'),
+                    dict(
+                        type='GetRandomScaleRotation',
+                        rot_factor=30,
+                        scale_factor=0.25),
+                    dict(type='MeshAffine', img_res=224),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(
+                        type='ToTensor',
+                        keys=[
+                            'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                            'smpl_body_pose', 'smpl_global_orient',
+                            'smpl_betas', 'smpl_transl', 'keypoints2d',
+                            'keypoints3d', 'sample_idx'
+                        ]),
+                    dict(
+                        type='Collect',
+                        keys=[
+                            'img', 'has_smpl', 'has_keypoints3d',
+                            'has_keypoints2d', 'smpl_body_pose',
+                            'smpl_global_orient', 'smpl_betas', 'smpl_transl',
+                            'keypoints2d', 'keypoints3d', 'sample_idx'
+                        ],
+                        meta_keys=[
+                            'image_path', 'center', 'scale', 'rotation'
+                        ])
+                ],
+                convention='smpl_24',
+                ann_file='mpi_inf_3dhp_train.npz')
+        ],
+        partition=[0.5, 0.233, 0.046, 0.021, 0.2]),
+    test=dict(
+        type='HumanImageDataset',
+        body_model=dict(
+            type='GenderedSMPL',
+            keypoint_src='h36m',
+            keypoint_dst='h36m',
+            model_path='data/body_models/smpl',
+            joints_regressor='data/body_models/J_regressor_h36m.npy'),
+        dataset_name='pw3d',
+        data_prefix='data',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='GetRandomScaleRotation', rot_factor=0, scale_factor=0),
+            dict(type='MeshAffine', img_res=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(
+                type='ToTensor',
+                keys=[
+                    'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                    'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+                    'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+                ]),
+            dict(
+                type='Collect',
+                keys=[
+                    'img', 'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                    'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+                    'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+                ],
+                meta_keys=['image_path', 'center', 'scale', 'rotation'])
+        ],
+        ann_file='pw3d_test.npz'),
+    val=dict(
+        type='HumanImageDataset',
+        body_model=dict(
+            type='GenderedSMPL',
+            keypoint_src='h36m',
+            keypoint_dst='h36m',
+            model_path='data/body_models/smpl',
+            joints_regressor='data/body_models/J_regressor_h36m.npy'),
+        dataset_name='pw3d',
+        data_prefix='data',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='GetRandomScaleRotation', rot_factor=0, scale_factor=0),
+            dict(type='MeshAffine', img_res=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(
+                type='ToTensor',
+                keys=[
+                    'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                    'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+                    'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+                ]),
+            dict(
+                type='Collect',
+                keys=[
+                    'img', 'has_smpl', 'has_keypoints3d', 'has_keypoints2d',
+                    'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+                    'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+                ],
+                meta_keys=['image_path', 'center', 'scale', 'rotation'])
+        ],
+        ann_file='pw3d_test.npz'))
+work_dir = 'workspace/pare'
+gpu_ids = range(0, 1)
+
+2023-02-24 15:45:53,908 - mmhuman3d - INFO - initialize ImageBodyModelEstimator with init_cfg {'type': 'Pretrained', 'checkpoint': 'data/pretrained_models/hrnet_w32_conv_pare_coco.pth'}

@@ -1,0 +1,19 @@
+astropy
+cdflib<0.4.0
+chumpy
+colormap
+easydev
+h5py
+matplotlib
+numpy
+opencv-python
+pandas
+pickle5; python_version < '3.8'
+plyfile
+rtree
+scikit-image
+scipy
+smplx
+tqdm
+trimesh
+vedo

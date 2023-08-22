@@ -1,0 +1,25 @@
+====== epoch 7 ======
+mpjpe=95.60
+pa-mpjpe=57.35
+
+====== epoch 8 ======
+mpjpe=98.08
+pa-mpjpe=57.81
+
+====== epoch 9 ======
+mpjpe=92.47
+pa-mpjpe=56.22
+
+====== epoch 10 ======
+mpjpe=99.91
+pa-mpjpe=58.39
+
+====== epoch 11 ======
+mpjpe=97.10
+pa-mpjpe=
+
+
+-------- only --------
+====== epoch 9 ======
+MPJPE=99.51
+PA-MPJPE : 57.80

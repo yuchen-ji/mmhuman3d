@@ -1,0 +1,1014 @@
+nohup: ignoring input
+2023-07-21 16:07:21,908 - mmhuman3d - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.16 (default, Jan 17 2023, 23:13:24) [GCC 11.2.0]
+CUDA available: True
+GPU 0,1,2,3,4,5: NVIDIA TITAN RTX
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 11.0, V11.0.221
+GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+PyTorch: 1.8.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2021.4-Product Build 20210904 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.7.0 (Git Hash 7aed236906b1f7a05c0917e5257a1af05e9ff683)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 10.2
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_37,code=compute_37
+  - CuDNN 7.6.5
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=10.2, CUDNN_VERSION=7.6.5, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.8.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+TorchVision: 0.9.0
+OpenCV: 4.7.0
+MMCV: 1.5.3
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 10.2
+MMHuman3d: 0.10.0+84cfecb
+------------------------------------------------------------
+
+2023-07-21 16:07:21,909 - mmhuman3d - INFO - Distributed training: True
+2023-07-21 16:07:23,501 - mmhuman3d - INFO - Config:
+checkpoint_config = dict(interval=1)
+log_config = dict(
+    interval=50,
+    hooks=[dict(type='TextLoggerHook'),
+           dict(type='TensorboardLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = 'workspace/ormr/only/epoch_3.pth'
+workflow = [('train', 1)]
+use_adversarial_train = True
+evaluation = dict(interval=1, metric=['pa-mpjpe', 'mpjpe'])
+img_res = 224
+optimizer = dict(
+    backbone=dict(type='Adam', lr=0.0001),
+    head=dict(type='Adam', lr=0.0001),
+    disc=dict(type='Adam', lr=0.0001))
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(policy='Fixed', by_epoch=False)
+runner = dict(type='EpochBasedRunner', max_epochs=200)
+hrnet_extra = dict(
+    stage1=dict(
+        num_modules=1,
+        num_branches=1,
+        block='BOTTLENECK',
+        num_blocks=(4, ),
+        num_channels=(64, )),
+    stage2=dict(
+        num_modules=1,
+        num_branches=2,
+        block='BASIC',
+        num_blocks=(4, 4),
+        num_channels=(32, 64)),
+    stage3=dict(
+        num_modules=4,
+        num_branches=3,
+        block='BASIC',
+        num_blocks=(4, 4, 4),
+        num_channels=(32, 64, 128)),
+    stage4=dict(
+        num_modules=3,
+        num_branches=4,
+        block='BASIC',
+        num_blocks=(4, 4, 4, 4),
+        num_channels=(32, 64, 128, 256)),
+    return_list=False,
+    single_task=True,
+    multi_tasks=False,
+    downsample=False,
+    use_conv=False,
+    final_conv_kernel=1,
+    pretrained_layers=[
+        'conv1', 'bn1', 'conv2', 'bn2', 'layer1', 'transition1', 'stage2',
+        'transition2', 'stage3', 'transition3', 'stage4'
+    ])
+find_unused_parameters = True
+model = dict(
+    type='ImageBodyModelEstimator',
+    backbone=dict(
+        type='PoseHighResolutionNet',
+        extra=dict(
+            stage1=dict(
+                num_modules=1,
+                num_branches=1,
+                block='BOTTLENECK',
+                num_blocks=(4, ),
+                num_channels=(64, )),
+            stage2=dict(
+                num_modules=1,
+                num_branches=2,
+                block='BASIC',
+                num_blocks=(4, 4),
+                num_channels=(32, 64)),
+            stage3=dict(
+                num_modules=4,
+                num_branches=3,
+                block='BASIC',
+                num_blocks=(4, 4, 4),
+                num_channels=(32, 64, 128)),
+            stage4=dict(
+                num_modules=3,
+                num_branches=4,
+                block='BASIC',
+                num_blocks=(4, 4, 4, 4),
+                num_channels=(32, 64, 128, 256)),
+            return_list=False,
+            single_task=True,
+            multi_tasks=False,
+            downsample=False,
+            use_conv=False,
+            final_conv_kernel=1,
+            pretrained_layers=[
+                'conv1', 'bn1', 'conv2', 'bn2', 'layer1', 'transition1',
+                'stage2', 'transition2', 'stage3', 'transition3', 'stage4'
+            ]),
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint='data/pretrained_models/hrnet_pretrain.pth')),
+    head=dict(
+        type='HMRHead',
+        feat_dim=2048,
+        smpl_mean_params='data/body_models/smpl_mean_params.npz'),
+    body_model_train=dict(
+        type='SMPL',
+        keypoint_src='smpl_54',
+        keypoint_dst='smpl_54',
+        model_path='data/body_models/smpl',
+        keypoint_approximate=True,
+        extra_joints_regressor='data/body_models/J_regressor_extra.npy'),
+    body_model_test=dict(
+        type='SMPL',
+        keypoint_src='h36m',
+        keypoint_dst='h36m',
+        model_path='data/body_models/smpl',
+        joints_regressor='data/body_models/J_regressor_h36m.npy'),
+    convention='smpl_54',
+    loss_keypoints3d=dict(type='SmoothL1Loss', loss_weight=100),
+    loss_keypoints2d=dict(type='SmoothL1Loss', loss_weight=10),
+    loss_vertex=dict(type='L1Loss', loss_weight=2),
+    loss_smpl_pose=dict(type='MSELoss', loss_weight=3),
+    loss_smpl_betas=dict(type='MSELoss', loss_weight=0.02),
+    loss_adv=dict(
+        type='GANLoss',
+        gan_type='lsgan',
+        real_label_val=1.0,
+        fake_label_val=0.0,
+        loss_weight=1),
+    disc=dict(type='SMPLDiscriminator'))
+dataset_type = 'HumanImageDataset'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+data_keys = [
+    'has_smpl', 'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+    'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+]
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='RandomChannelNoise', noise_factor=0.4),
+    dict(type='RandomHorizontalFlip', flip_prob=0.5, convention='smpl_54'),
+    dict(type='GetRandomScaleRotation', rot_factor=30, scale_factor=0.25),
+    dict(type='MeshAffine', img_res=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(
+        type='ToTensor',
+        keys=[
+            'has_smpl', 'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+            'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+        ]),
+    dict(
+        type='Collect',
+        keys=[
+            'img', 'has_smpl', 'smpl_body_pose', 'smpl_global_orient',
+            'smpl_betas', 'smpl_transl', 'keypoints2d', 'keypoints3d',
+            'sample_idx'
+        ],
+        meta_keys=['image_path', 'center', 'scale', 'rotation'])
+]
+adv_data_keys = [
+    'smpl_body_pose', 'smpl_global_orient', 'smpl_betas', 'smpl_transl'
+]
+train_adv_pipeline = [
+    dict(
+        type='Collect',
+        keys=[
+            'smpl_body_pose', 'smpl_global_orient', 'smpl_betas', 'smpl_transl'
+        ],
+        meta_keys=[])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='GetRandomScaleRotation', rot_factor=0, scale_factor=0),
+    dict(type='MeshAffine', img_res=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(
+        type='ToTensor',
+        keys=[
+            'has_smpl', 'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+            'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+        ]),
+    dict(
+        type='Collect',
+        keys=[
+            'img', 'has_smpl', 'smpl_body_pose', 'smpl_global_orient',
+            'smpl_betas', 'smpl_transl', 'keypoints2d', 'keypoints3d',
+            'sample_idx'
+        ],
+        meta_keys=['image_path', 'center', 'scale', 'rotation'])
+]
+inference_pipeline = [
+    dict(type='MeshAffine', img_res=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(
+        type='Collect',
+        keys=['img', 'sample_idx'],
+        meta_keys=['image_path', 'center', 'scale', 'rotation'])
+]
+data = dict(
+    samples_per_gpu=32,
+    workers_per_gpu=1,
+    train=dict(
+        type='AdversarialDataset',
+        train_dataset=dict(
+            type='MixedDataset',
+            configs=[
+                dict(
+                    type='HumanImageDataset',
+                    dataset_name='h36m',
+                    data_prefix='data',
+                    pipeline=[
+                        dict(type='LoadImageFromFile'),
+                        dict(type='RandomChannelNoise', noise_factor=0.4),
+                        dict(
+                            type='RandomHorizontalFlip',
+                            flip_prob=0.5,
+                            convention='smpl_54'),
+                        dict(
+                            type='GetRandomScaleRotation',
+                            rot_factor=30,
+                            scale_factor=0.25),
+                        dict(type='MeshAffine', img_res=224),
+                        dict(
+                            type='Normalize',
+                            mean=[123.675, 116.28, 103.53],
+                            std=[58.395, 57.12, 57.375],
+                            to_rgb=True),
+                        dict(type='ImageToTensor', keys=['img']),
+                        dict(
+                            type='ToTensor',
+                            keys=[
+                                'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ]),
+                        dict(
+                            type='Collect',
+                            keys=[
+                                'img', 'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ],
+                            meta_keys=[
+                                'image_path', 'center', 'scale', 'rotation'
+                            ])
+                    ],
+                    convention='smpl_54',
+                    ann_file='h36m_train.npz'),
+                dict(
+                    type='HumanImageDataset',
+                    dataset_name='mpi_inf_3dhp',
+                    data_prefix='data',
+                    pipeline=[
+                        dict(type='LoadImageFromFile'),
+                        dict(type='RandomChannelNoise', noise_factor=0.4),
+                        dict(
+                            type='RandomHorizontalFlip',
+                            flip_prob=0.5,
+                            convention='smpl_54'),
+                        dict(
+                            type='GetRandomScaleRotation',
+                            rot_factor=30,
+                            scale_factor=0.25),
+                        dict(type='MeshAffine', img_res=224),
+                        dict(
+                            type='Normalize',
+                            mean=[123.675, 116.28, 103.53],
+                            std=[58.395, 57.12, 57.375],
+                            to_rgb=True),
+                        dict(type='ImageToTensor', keys=['img']),
+                        dict(
+                            type='ToTensor',
+                            keys=[
+                                'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ]),
+                        dict(
+                            type='Collect',
+                            keys=[
+                                'img', 'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ],
+                            meta_keys=[
+                                'image_path', 'center', 'scale', 'rotation'
+                            ])
+                    ],
+                    convention='smpl_54',
+                    ann_file='mpi_inf_3dhp_train.npz'),
+                dict(
+                    type='HumanImageDataset',
+                    dataset_name='lsp',
+                    data_prefix='data',
+                    pipeline=[
+                        dict(type='LoadImageFromFile'),
+                        dict(type='RandomChannelNoise', noise_factor=0.4),
+                        dict(
+                            type='RandomHorizontalFlip',
+                            flip_prob=0.5,
+                            convention='smpl_54'),
+                        dict(
+                            type='GetRandomScaleRotation',
+                            rot_factor=30,
+                            scale_factor=0.25),
+                        dict(type='MeshAffine', img_res=224),
+                        dict(
+                            type='Normalize',
+                            mean=[123.675, 116.28, 103.53],
+                            std=[58.395, 57.12, 57.375],
+                            to_rgb=True),
+                        dict(type='ImageToTensor', keys=['img']),
+                        dict(
+                            type='ToTensor',
+                            keys=[
+                                'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ]),
+                        dict(
+                            type='Collect',
+                            keys=[
+                                'img', 'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ],
+                            meta_keys=[
+                                'image_path', 'center', 'scale', 'rotation'
+                            ])
+                    ],
+                    convention='smpl_54',
+                    ann_file='lsp_train.npz'),
+                dict(
+                    type='HumanImageDataset',
+                    dataset_name='lspet',
+                    data_prefix='data',
+                    pipeline=[
+                        dict(type='LoadImageFromFile'),
+                        dict(type='RandomChannelNoise', noise_factor=0.4),
+                        dict(
+                            type='RandomHorizontalFlip',
+                            flip_prob=0.5,
+                            convention='smpl_54'),
+                        dict(
+                            type='GetRandomScaleRotation',
+                            rot_factor=30,
+                            scale_factor=0.25),
+                        dict(type='MeshAffine', img_res=224),
+                        dict(
+                            type='Normalize',
+                            mean=[123.675, 116.28, 103.53],
+                            std=[58.395, 57.12, 57.375],
+                            to_rgb=True),
+                        dict(type='ImageToTensor', keys=['img']),
+                        dict(
+                            type='ToTensor',
+                            keys=[
+                                'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ]),
+                        dict(
+                            type='Collect',
+                            keys=[
+                                'img', 'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ],
+                            meta_keys=[
+                                'image_path', 'center', 'scale', 'rotation'
+                            ])
+                    ],
+                    convention='smpl_54',
+                    ann_file='lspet_train.npz'),
+                dict(
+                    type='HumanImageDataset',
+                    dataset_name='mpii',
+                    data_prefix='data',
+                    pipeline=[
+                        dict(type='LoadImageFromFile'),
+                        dict(type='RandomChannelNoise', noise_factor=0.4),
+                        dict(
+                            type='RandomHorizontalFlip',
+                            flip_prob=0.5,
+                            convention='smpl_54'),
+                        dict(
+                            type='GetRandomScaleRotation',
+                            rot_factor=30,
+                            scale_factor=0.25),
+                        dict(type='MeshAffine', img_res=224),
+                        dict(
+                            type='Normalize',
+                            mean=[123.675, 116.28, 103.53],
+                            std=[58.395, 57.12, 57.375],
+                            to_rgb=True),
+                        dict(type='ImageToTensor', keys=['img']),
+                        dict(
+                            type='ToTensor',
+                            keys=[
+                                'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ]),
+                        dict(
+                            type='Collect',
+                            keys=[
+                                'img', 'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ],
+                            meta_keys=[
+                                'image_path', 'center', 'scale', 'rotation'
+                            ])
+                    ],
+                    convention='smpl_54',
+                    ann_file='mpii_train.npz'),
+                dict(
+                    type='HumanImageDataset',
+                    dataset_name='coco',
+                    data_prefix='data',
+                    pipeline=[
+                        dict(type='LoadImageFromFile'),
+                        dict(type='RandomChannelNoise', noise_factor=0.4),
+                        dict(
+                            type='RandomHorizontalFlip',
+                            flip_prob=0.5,
+                            convention='smpl_54'),
+                        dict(
+                            type='GetRandomScaleRotation',
+                            rot_factor=30,
+                            scale_factor=0.25),
+                        dict(type='MeshAffine', img_res=224),
+                        dict(
+                            type='Normalize',
+                            mean=[123.675, 116.28, 103.53],
+                            std=[58.395, 57.12, 57.375],
+                            to_rgb=True),
+                        dict(type='ImageToTensor', keys=['img']),
+                        dict(
+                            type='ToTensor',
+                            keys=[
+                                'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ]),
+                        dict(
+                            type='Collect',
+                            keys=[
+                                'img', 'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ],
+                            meta_keys=[
+                                'image_path', 'center', 'scale', 'rotation'
+                            ])
+                    ],
+                    convention='smpl_54',
+                    ann_file='coco_2014_train.npz')
+            ],
+            partition=[0.35, 0.15, 0.1, 0.1, 0.1, 0.2]),
+        adv_dataset=dict(
+            type='MeshDataset',
+            dataset_name='cmu_mosh',
+            data_prefix='data',
+            pipeline=[
+                dict(
+                    type='Collect',
+                    keys=[
+                        'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+                        'smpl_transl'
+                    ],
+                    meta_keys=[])
+            ],
+            ann_file='cmu_mosh.npz')),
+    test=dict(
+        type='HumanImageDataset',
+        body_model=dict(
+            type='GenderedSMPL',
+            keypoint_src='h36m',
+            keypoint_dst='h36m',
+            model_path='data/body_models/smpl',
+            joints_regressor='data/body_models/J_regressor_h36m.npy'),
+        dataset_name='pw3d',
+        data_prefix='data',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='GetRandomScaleRotation', rot_factor=0, scale_factor=0),
+            dict(type='MeshAffine', img_res=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(
+                type='ToTensor',
+                keys=[
+                    'has_smpl', 'smpl_body_pose', 'smpl_global_orient',
+                    'smpl_betas', 'smpl_transl', 'keypoints2d', 'keypoints3d',
+                    'sample_idx'
+                ]),
+            dict(
+                type='Collect',
+                keys=[
+                    'img', 'has_smpl', 'smpl_body_pose', 'smpl_global_orient',
+                    'smpl_betas', 'smpl_transl', 'keypoints2d', 'keypoints3d',
+                    'sample_idx'
+                ],
+                meta_keys=['image_path', 'center', 'scale', 'rotation'])
+        ],
+        ann_file='pw3d_test.npz'))
+work_dir = 'workspace/ormr/only'
+gpu_ids = range(0, 4)
+
+WARNING: You are using a SMPL model, with only 10 shape coefficients.WARNING: You are using a SMPL model, with only 10 shape coefficients.
+
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+2023-07-21 16:07:24,687 - mmhuman3d - INFO - initialize PoseHighResolutionNet with init_cfg {'type': 'Pretrained', 'checkpoint': 'data/pretrained_models/hrnet_pretrain.pth'}
+2023-07-21 16:07:24,689 - mmcv - INFO - load model from: data/pretrained_models/hrnet_pretrain.pth
+2023-07-21 16:07:24,690 - mmcv - INFO - load checkpoint from local path: data/pretrained_models/hrnet_pretrain.pth
+2023-07-21 16:07:33,186 - mmcv - WARNING - The model and loaded state dict do not match exactly
+
+size mismatch for final_layer.weight: copying a param with shape torch.Size([17, 32, 1, 1]) from checkpoint, the shape in current model is torch.Size([54, 32, 1, 1]).
+size mismatch for final_layer.bias: copying a param with shape torch.Size([17]) from checkpoint, the shape in current model is torch.Size([54]).
+missing keys in source state_dict: stage4.2.fuse_layers.1.0.0.0.weight, stage4.2.fuse_layers.1.0.0.1.weight, stage4.2.fuse_layers.1.0.0.1.bias, stage4.2.fuse_layers.1.0.0.1.running_mean, stage4.2.fuse_layers.1.0.0.1.running_var, stage4.2.fuse_layers.1.2.0.weight, stage4.2.fuse_layers.1.2.1.weight, stage4.2.fuse_layers.1.2.1.bias, stage4.2.fuse_layers.1.2.1.running_mean, stage4.2.fuse_layers.1.2.1.running_var, stage4.2.fuse_layers.1.3.0.weight, stage4.2.fuse_layers.1.3.1.weight, stage4.2.fuse_layers.1.3.1.bias, stage4.2.fuse_layers.1.3.1.running_mean, stage4.2.fuse_layers.1.3.1.running_var, stage4.2.fuse_layers.2.0.0.0.weight, stage4.2.fuse_layers.2.0.0.1.weight, stage4.2.fuse_layers.2.0.0.1.bias, stage4.2.fuse_layers.2.0.0.1.running_mean, stage4.2.fuse_layers.2.0.0.1.running_var, stage4.2.fuse_layers.2.0.1.0.weight, stage4.2.fuse_layers.2.0.1.1.weight, stage4.2.fuse_layers.2.0.1.1.bias, stage4.2.fuse_layers.2.0.1.1.running_mean, stage4.2.fuse_layers.2.0.1.1.running_var, stage4.2.fuse_layers.2.1.0.0.weight, stage4.2.fuse_layers.2.1.0.1.weight, stage4.2.fuse_layers.2.1.0.1.bias, stage4.2.fuse_layers.2.1.0.1.running_mean, stage4.2.fuse_layers.2.1.0.1.running_var, stage4.2.fuse_layers.2.3.0.weight, stage4.2.fuse_layers.2.3.1.weight, stage4.2.fuse_layers.2.3.1.bias, stage4.2.fuse_layers.2.3.1.running_mean, stage4.2.fuse_layers.2.3.1.running_var, stage4.2.fuse_layers.3.0.0.0.weight, stage4.2.fuse_layers.3.0.0.1.weight, stage4.2.fuse_layers.3.0.0.1.bias, stage4.2.fuse_layers.3.0.0.1.running_mean, stage4.2.fuse_layers.3.0.0.1.running_var, stage4.2.fuse_layers.3.0.1.0.weight, stage4.2.fuse_layers.3.0.1.1.weight, stage4.2.fuse_layers.3.0.1.1.bias, stage4.2.fuse_layers.3.0.1.1.running_mean, stage4.2.fuse_layers.3.0.1.1.running_var, stage4.2.fuse_layers.3.0.2.0.weight, stage4.2.fuse_layers.3.0.2.1.weight, stage4.2.fuse_layers.3.0.2.1.bias, stage4.2.fuse_layers.3.0.2.1.running_mean, stage4.2.fuse_layers.3.0.2.1.running_var, stage4.2.fuse_layers.3.1.0.0.weight, stage4.2.fuse_layers.3.1.0.1.weight, stage4.2.fuse_layers.3.1.0.1.bias, stage4.2.fuse_layers.3.1.0.1.running_mean, stage4.2.fuse_layers.3.1.0.1.running_var, stage4.2.fuse_layers.3.1.1.0.weight, stage4.2.fuse_layers.3.1.1.1.weight, stage4.2.fuse_layers.3.1.1.1.bias, stage4.2.fuse_layers.3.1.1.1.running_mean, stage4.2.fuse_layers.3.1.1.1.running_var, stage4.2.fuse_layers.3.2.0.0.weight, stage4.2.fuse_layers.3.2.0.1.weight, stage4.2.fuse_layers.3.2.0.1.bias, stage4.2.fuse_layers.3.2.0.1.running_mean, stage4.2.fuse_layers.3.2.0.1.running_var, incre_modules.0.0.conv1.weight, incre_modules.0.0.bn1.weight, incre_modules.0.0.bn1.bias, incre_modules.0.0.bn1.running_mean, incre_modules.0.0.bn1.running_var, incre_modules.0.0.conv2.weight, incre_modules.0.0.bn2.weight, incre_modules.0.0.bn2.bias, incre_modules.0.0.bn2.running_mean, incre_modules.0.0.bn2.running_var, incre_modules.0.0.conv3.weight, incre_modules.0.0.bn3.weight, incre_modules.0.0.bn3.bias, incre_modules.0.0.bn3.running_mean, incre_modules.0.0.bn3.running_var, incre_modules.0.0.downsample.0.weight, incre_modules.0.0.downsample.1.weight, incre_modules.0.0.downsample.1.bias, incre_modules.0.0.downsample.1.running_mean, incre_modules.0.0.downsample.1.running_var, incre_modules.1.0.conv1.weight, incre_modules.1.0.bn1.weight, incre_modules.1.0.bn1.bias, incre_modules.1.0.bn1.running_mean, incre_modules.1.0.bn1.running_var, incre_modules.1.0.conv2.weight, incre_modules.1.0.bn2.weight, incre_modules.1.0.bn2.bias, incre_modules.1.0.bn2.running_mean, incre_modules.1.0.bn2.running_var, incre_modules.1.0.conv3.weight, incre_modules.1.0.bn3.weight, incre_modules.1.0.bn3.bias, incre_modules.1.0.bn3.running_mean, incre_modules.1.0.bn3.running_var, incre_modules.1.0.downsample.0.weight, incre_modules.1.0.downsample.1.weight, incre_modules.1.0.downsample.1.bias, incre_modules.1.0.downsample.1.running_mean, incre_modules.1.0.downsample.1.running_var, incre_modules.2.0.conv1.weight, incre_modules.2.0.bn1.weight, incre_modules.2.0.bn1.bias, incre_modules.2.0.bn1.running_mean, incre_modules.2.0.bn1.running_var, incre_modules.2.0.conv2.weight, incre_modules.2.0.bn2.weight, incre_modules.2.0.bn2.bias, incre_modules.2.0.bn2.running_mean, incre_modules.2.0.bn2.running_var, incre_modules.2.0.conv3.weight, incre_modules.2.0.bn3.weight, incre_modules.2.0.bn3.bias, incre_modules.2.0.bn3.running_mean, incre_modules.2.0.bn3.running_var, incre_modules.2.0.downsample.0.weight, incre_modules.2.0.downsample.1.weight, incre_modules.2.0.downsample.1.bias, incre_modules.2.0.downsample.1.running_mean, incre_modules.2.0.downsample.1.running_var, incre_modules.3.0.conv1.weight, incre_modules.3.0.bn1.weight, incre_modules.3.0.bn1.bias, incre_modules.3.0.bn1.running_mean, incre_modules.3.0.bn1.running_var, incre_modules.3.0.conv2.weight, incre_modules.3.0.bn2.weight, incre_modules.3.0.bn2.bias, incre_modules.3.0.bn2.running_mean, incre_modules.3.0.bn2.running_var, incre_modules.3.0.conv3.weight, incre_modules.3.0.bn3.weight, incre_modules.3.0.bn3.bias, incre_modules.3.0.bn3.running_mean, incre_modules.3.0.bn3.running_var, incre_modules.3.0.downsample.0.weight, incre_modules.3.0.downsample.1.weight, incre_modules.3.0.downsample.1.bias, incre_modules.3.0.downsample.1.running_mean, incre_modules.3.0.downsample.1.running_var, downsamp_modules.0.0.weight, downsamp_modules.0.0.bias, downsamp_modules.0.1.weight, downsamp_modules.0.1.bias, downsamp_modules.0.1.running_mean, downsamp_modules.0.1.running_var, downsamp_modules.1.0.weight, downsamp_modules.1.0.bias, downsamp_modules.1.1.weight, downsamp_modules.1.1.bias, downsamp_modules.1.1.running_mean, downsamp_modules.1.1.running_var, downsamp_modules.2.0.weight, downsamp_modules.2.0.bias, downsamp_modules.2.1.weight, downsamp_modules.2.1.bias, downsamp_modules.2.1.running_mean, downsamp_modules.2.1.running_var, neck_layer.0.weight, neck_layer.0.bias, neck_layer.1.weight, neck_layer.1.bias, neck_layer.1.running_mean, neck_layer.1.running_var
+
+2023-07-21 16:07:59,375 - mmhuman3d - INFO - load checkpoint from local path: workspace/ormr/only/epoch_3.pth
+2023-07-21 16:08:03,968 - mmhuman3d - INFO - resumed epoch 3, iter 7317
+2023-07-21 16:08:03,977 - mmhuman3d - INFO - Start running, host: root@518b9ea961fb, work_dir: /workspaces/mmhuman3d/workspace/ormr/only
+2023-07-21 16:08:03,978 - mmhuman3d - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) FixedLrUpdaterHook                 
+(NORMAL      ) CheckpointHook                     
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) FixedLrUpdaterHook                 
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) FixedLrUpdaterHook                 
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+2023-07-21 16:08:03,978 - mmhuman3d - INFO - workflow: [('train', 1)], max: 200 epochs
+2023-07-21 16:08:03,978 - mmhuman3d - INFO - Checkpoints will be saved to /workspaces/mmhuman3d/workspace/ormr/only by HardDiskBackend.
+[W reducer.cpp:1050] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters. This flag results in an extra traversal of the autograd graph every iteration, which can adversely affect performance. If your model indeed never has any unused parameters, consider turning this flag off. Note that this warning may be a false positive your model has flow control causing later iterations to have unused parameters. (function operator())
+[W reducer.cpp:1050] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters. This flag results in an extra traversal of the autograd graph every iteration, which can adversely affect performance. If your model indeed never has any unused parameters, consider turning this flag off. Note that this warning may be a false positive your model has flow control causing later iterations to have unused parameters. (function operator())
+[W reducer.cpp:1050] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters. This flag results in an extra traversal of the autograd graph every iteration, which can adversely affect performance. If your model indeed never has any unused parameters, consider turning this flag off. Note that this warning may be a false positive your model has flow control causing later iterations to have unused parameters. (function operator())
+[W reducer.cpp:1050] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters. This flag results in an extra traversal of the autograd graph every iteration, which can adversely affect performance. If your model indeed never has any unused parameters, consider turning this flag off. Note that this warning may be a false positive your model has flow control causing later iterations to have unused parameters. (function operator())
+2023-07-21 16:20:17,169 - mmhuman3d - INFO - Epoch [4][50/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 81 days, 11:17:10, time: 14.651, data_time: 10.482, memory: 6986, keypoints3d_loss: 0.2916, keypoints2d_loss: 0.0858, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2746, loss: 0.6520
+2023-07-21 16:32:06,344 - mmhuman3d - INFO - Epoch [4][100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 80 days, 3:51:47, time: 14.184, data_time: 0.677, memory: 6986, keypoints3d_loss: 0.2684, keypoints2d_loss: 0.0798, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2733, loss: 0.6215
+2023-07-21 16:43:00,922 - mmhuman3d - INFO - Epoch [4][150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 77 days, 16:41:39, time: 13.092, data_time: 0.201, memory: 6986, keypoints3d_loss: 0.2872, keypoints2d_loss: 0.0824, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2735, loss: 0.6431
+2023-07-21 16:54:10,939 - mmhuman3d - INFO - Epoch [4][200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 76 days, 21:18:41, time: 13.400, data_time: 0.023, memory: 6986, keypoints3d_loss: 0.2708, keypoints2d_loss: 0.0797, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2750, loss: 0.6255
+2023-07-21 17:05:24,024 - mmhuman3d - INFO - Epoch [4][250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 76 days, 11:14:37, time: 13.462, data_time: 0.016, memory: 6986, keypoints3d_loss: 0.2724, keypoints2d_loss: 0.0808, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2752, loss: 0.6284
+2023-07-21 17:16:18,661 - mmhuman3d - INFO - Epoch [4][300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 75 days, 20:15:27, time: 13.092, data_time: 1.311, memory: 6986, keypoints3d_loss: 0.2640, keypoints2d_loss: 0.0803, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2747, loss: 0.6190
+2023-07-21 17:27:26,106 - mmhuman3d - INFO - Epoch [4][350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 75 days, 14:23:48, time: 13.349, data_time: 0.896, memory: 6986, keypoints3d_loss: 0.2809, keypoints2d_loss: 0.0853, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2760, loss: 0.6422
+2023-07-21 17:38:21,906 - mmhuman3d - INFO - Epoch [4][400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 75 days, 6:03:58, time: 13.116, data_time: 6.773, memory: 6986, keypoints3d_loss: 0.2673, keypoints2d_loss: 0.0796, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2740, loss: 0.6209
+2023-07-21 17:49:46,331 - mmhuman3d - INFO - Epoch [4][450/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 75 days, 8:02:40, time: 13.689, data_time: 0.040, memory: 6986, keypoints3d_loss: 0.2545, keypoints2d_loss: 0.0785, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2736, loss: 0.6065
+2023-07-21 18:00:52,375 - mmhuman3d - INFO - Epoch [4][500/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 75 days, 4:40:31, time: 13.321, data_time: 0.534, memory: 6986, keypoints3d_loss: 0.2634, keypoints2d_loss: 0.0818, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2747, loss: 0.6200
+2023-07-21 18:12:02,824 - mmhuman3d - INFO - Epoch [4][550/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 75 days, 2:57:12, time: 13.409, data_time: 0.716, memory: 6986, keypoints3d_loss: 0.2817, keypoints2d_loss: 0.0842, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2732, loss: 0.6392
+2023-07-21 18:22:56,281 - mmhuman3d - INFO - Epoch [4][600/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 21:42:35, time: 13.069, data_time: 0.141, memory: 6986, keypoints3d_loss: 0.2664, keypoints2d_loss: 0.0786, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2758, loss: 0.6208
+2023-07-21 18:33:55,142 - mmhuman3d - INFO - Epoch [4][650/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 18:21:28, time: 13.177, data_time: 0.017, memory: 6986, keypoints3d_loss: 0.2743, keypoints2d_loss: 0.0800, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2754, loss: 0.6297
+2023-07-21 18:44:57,393 - mmhuman3d - INFO - Epoch [4][700/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 16:05:59, time: 13.245, data_time: 5.494, memory: 6986, keypoints3d_loss: 0.2748, keypoints2d_loss: 0.0816, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2769, loss: 0.6333
+2023-07-21 18:55:37,413 - mmhuman3d - INFO - Epoch [4][750/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 10:10:17, time: 12.801, data_time: 6.461, memory: 6986, keypoints3d_loss: 0.2532, keypoints2d_loss: 0.0792, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2764, loss: 0.6088
+2023-07-21 19:06:21,016 - mmhuman3d - INFO - Epoch [4][800/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 5:33:12, time: 12.872, data_time: 11.205, memory: 6986, keypoints3d_loss: 0.2627, keypoints2d_loss: 0.0786, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2761, loss: 0.6174
+2023-07-21 19:17:45,033 - mmhuman3d - INFO - Epoch [4][850/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 7:47:52, time: 13.681, data_time: 3.432, memory: 6986, keypoints3d_loss: 0.2464, keypoints2d_loss: 0.0766, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2747, loss: 0.5977
+2023-07-21 19:28:55,390 - mmhuman3d - INFO - Epoch [4][900/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 7:44:37, time: 13.407, data_time: 0.017, memory: 6986, keypoints3d_loss: 0.2667, keypoints2d_loss: 0.0767, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2775, loss: 0.6208
+2023-07-21 19:40:09,961 - mmhuman3d - INFO - Epoch [4][950/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 8:16:01, time: 13.491, data_time: 0.018, memory: 6986, keypoints3d_loss: 0.2735, keypoints2d_loss: 0.0793, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2767, loss: 0.6295
+2023-07-21 19:51:09,566 - mmhuman3d - INFO - Epoch [4][1000/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 6:43:27, time: 13.191, data_time: 0.018, memory: 6986, keypoints3d_loss: 0.2733, keypoints2d_loss: 0.0783, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2753, loss: 0.6269
+2023-07-21 20:02:22,095 - mmhuman3d - INFO - Epoch [4][1050/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 6:58:03, time: 13.453, data_time: 0.019, memory: 6986, keypoints3d_loss: 0.2585, keypoints2d_loss: 0.0739, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2759, loss: 0.6083
+2023-07-21 20:13:16,169 - mmhuman3d - INFO - Epoch [4][1100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 4:55:33, time: 13.081, data_time: 0.252, memory: 6986, keypoints3d_loss: 0.2662, keypoints2d_loss: 0.0771, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2772, loss: 0.6204
+2023-07-21 20:24:22,503 - mmhuman3d - INFO - Epoch [4][1150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 4:27:55, time: 13.327, data_time: 6.316, memory: 6986, keypoints3d_loss: 0.2628, keypoints2d_loss: 0.0754, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2759, loss: 0.6141
+2023-07-21 20:35:41,850 - mmhuman3d - INFO - Epoch [4][1200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 5:28:20, time: 13.587, data_time: 12.873, memory: 6986, keypoints3d_loss: 0.2577, keypoints2d_loss: 0.0803, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2754, loss: 0.6135
+2023-07-21 20:47:24,787 - mmhuman3d - INFO - Epoch [4][1250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 8:53:29, time: 14.058, data_time: 13.430, memory: 6986, keypoints3d_loss: 0.2550, keypoints2d_loss: 0.0721, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2760, loss: 0.6031
+2023-07-21 20:58:34,650 - mmhuman3d - INFO - Epoch [4][1300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 8:38:45, time: 13.397, data_time: 12.767, memory: 6986, keypoints3d_loss: 0.2556, keypoints2d_loss: 0.0776, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2766, loss: 0.6099
+2023-07-21 21:10:00,996 - mmhuman3d - INFO - Epoch [4][1350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 10:02:07, time: 13.727, data_time: 13.097, memory: 6986, keypoints3d_loss: 0.2692, keypoints2d_loss: 0.0776, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2778, loss: 0.6246
+2023-07-21 21:21:11,182 - mmhuman3d - INFO - Epoch [4][1400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 9:46:42, time: 13.405, data_time: 12.776, memory: 6986, keypoints3d_loss: 0.2493, keypoints2d_loss: 0.0741, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2783, loss: 0.6017
+2023-07-21 21:32:31,274 - mmhuman3d - INFO - Epoch [4][1450/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 10:25:53, time: 13.602, data_time: 12.972, memory: 6986, keypoints3d_loss: 0.2545, keypoints2d_loss: 0.0751, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2759, loss: 0.6056
+2023-07-21 21:43:15,063 - mmhuman3d - INFO - Epoch [4][1500/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 7:48:22, time: 12.875, data_time: 11.264, memory: 6986, keypoints3d_loss: 0.2524, keypoints2d_loss: 0.0771, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2773, loss: 0.6069
+2023-07-21 21:54:49,925 - mmhuman3d - INFO - Epoch [4][1550/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 9:43:32, time: 13.898, data_time: 13.270, memory: 6986, keypoints3d_loss: 0.2434, keypoints2d_loss: 0.0750, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2780, loss: 0.5964
+2023-07-21 22:05:43,467 - mmhuman3d - INFO - Epoch [4][1600/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 8:04:34, time: 13.071, data_time: 12.443, memory: 6986, keypoints3d_loss: 0.2535, keypoints2d_loss: 0.0719, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2765, loss: 0.6018
+2023-07-21 22:16:26,920 - mmhuman3d - INFO - Epoch [4][1650/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 5:41:58, time: 12.868, data_time: 12.058, memory: 6986, keypoints3d_loss: 0.2567, keypoints2d_loss: 0.0744, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2783, loss: 0.6094
+2023-07-21 22:27:15,632 - mmhuman3d - INFO - Epoch [4][1700/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 3:52:09, time: 12.975, data_time: 1.074, memory: 6986, keypoints3d_loss: 0.2524, keypoints2d_loss: 0.0739, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2764, loss: 0.6026
+2023-07-21 22:38:14,701 - mmhuman3d - INFO - Epoch [4][1750/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 2:55:00, time: 13.181, data_time: 0.172, memory: 6986, keypoints3d_loss: 0.2517, keypoints2d_loss: 0.0742, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2775, loss: 0.6034
+2023-07-21 22:49:04,300 - mmhuman3d - INFO - Epoch [4][1800/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 74 days, 1:18:24, time: 12.992, data_time: 0.549, memory: 6986, keypoints3d_loss: 0.2661, keypoints2d_loss: 0.0778, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2758, loss: 0.6197
+2023-07-21 22:59:42,247 - mmhuman3d - INFO - Epoch [4][1850/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 73 days, 22:56:23, time: 12.759, data_time: 0.017, memory: 6986, keypoints3d_loss: 0.2470, keypoints2d_loss: 0.0725, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2770, loss: 0.5965
+2023-07-21 23:10:39,456 - mmhuman3d - INFO - Epoch [4][1900/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 73 days, 22:02:01, time: 13.144, data_time: 0.016, memory: 6986, keypoints3d_loss: 0.2569, keypoints2d_loss: 0.0746, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2782, loss: 0.6097
+2023-07-21 23:21:28,743 - mmhuman3d - INFO - Epoch [4][1950/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 73 days, 20:37:31, time: 12.986, data_time: 0.017, memory: 6986, keypoints3d_loss: 0.2521, keypoints2d_loss: 0.0736, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2774, loss: 0.6030
+2023-07-21 23:32:19,298 - mmhuman3d - INFO - Epoch [4][2000/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 73 days, 19:21:44, time: 13.011, data_time: 6.609, memory: 6986, keypoints3d_loss: 0.2434, keypoints2d_loss: 0.0719, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2767, loss: 0.5920
+2023-07-21 23:42:59,968 - mmhuman3d - INFO - Epoch [4][2050/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 73 days, 17:30:39, time: 12.813, data_time: 10.642, memory: 6986, keypoints3d_loss: 0.2457, keypoints2d_loss: 0.0746, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2768, loss: 0.5972
+2023-07-21 23:54:01,703 - mmhuman3d - INFO - Epoch [4][2100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 73 days, 17:04:12, time: 13.234, data_time: 5.260, memory: 6986, keypoints3d_loss: 0.2568, keypoints2d_loss: 0.0779, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2771, loss: 0.6118
+2023-07-22 00:04:45,046 - mmhuman3d - INFO - Epoch [4][2150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 73 days, 15:30:34, time: 12.868, data_time: 3.535, memory: 6986, keypoints3d_loss: 0.2575, keypoints2d_loss: 0.0730, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2783, loss: 0.6089
+2023-07-22 00:15:28,366 - mmhuman3d - INFO - Epoch [4][2200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 73 days, 14:00:29, time: 12.867, data_time: 6.557, memory: 6986, keypoints3d_loss: 0.2390, keypoints2d_loss: 0.0697, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2763, loss: 0.5849
+2023-07-22 00:26:00,210 - mmhuman3d - INFO - Epoch [4][2250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 73 days, 11:53:15, time: 12.637, data_time: 7.856, memory: 6986, keypoints3d_loss: 0.2407, keypoints2d_loss: 0.0734, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2763, loss: 0.5903
+2023-07-22 00:36:50,512 - mmhuman3d - INFO - Epoch [4][2300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 73 days, 10:55:05, time: 13.006, data_time: 0.828, memory: 6986, keypoints3d_loss: 0.2497, keypoints2d_loss: 0.0765, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2784, loss: 0.6046
+2023-07-22 00:47:48,845 - mmhuman3d - INFO - Epoch [4][2350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 73 days, 10:26:06, time: 13.166, data_time: 0.018, memory: 6986, keypoints3d_loss: 0.2379, keypoints2d_loss: 0.0711, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2771, loss: 0.5862
+2023-07-22 00:58:54,800 - mmhuman3d - INFO - Epoch [4][2400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 73 days, 10:23:06, time: 13.318, data_time: 0.122, memory: 6986, keypoints3d_loss: 0.2561, keypoints2d_loss: 0.0731, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2776, loss: 0.6067
+2023-07-22 01:07:10,985 - mmhuman3d - INFO - Saving checkpoint at 4 epochs
+2023-07-22 01:18:09,477 - mmhuman3d - INFO - Epoch [5][50/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 6:05:47, time: 13.139, data_time: 12.118, memory: 6986, keypoints3d_loss: 0.2277, keypoints2d_loss: 0.0711, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2780, loss: 0.5769
+2023-07-22 01:29:05,880 - mmhuman3d - INFO - Epoch [5][100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 6:05:29, time: 13.128, data_time: 12.414, memory: 6986, keypoints3d_loss: 0.2467, keypoints2d_loss: 0.0747, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2795, loss: 0.6009
+2023-07-22 01:40:02,439 - mmhuman3d - INFO - Epoch [5][150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 6:05:11, time: 13.130, data_time: 8.059, memory: 6986, keypoints3d_loss: 0.2744, keypoints2d_loss: 0.0836, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2792, loss: 0.6373
+2023-07-22 01:51:07,053 - mmhuman3d - INFO - Epoch [5][200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 6:29:02, time: 13.293, data_time: 0.019, memory: 6986, keypoints3d_loss: 0.2731, keypoints2d_loss: 0.0851, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2789, loss: 0.6371
+2023-07-22 02:02:12,415 - mmhuman3d - INFO - Epoch [5][250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 6:53:34, time: 13.307, data_time: 0.018, memory: 6986, keypoints3d_loss: 0.2547, keypoints2d_loss: 0.0747, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2781, loss: 0.6074
+2023-07-22 02:12:58,670 - mmhuman3d - INFO - Epoch [5][300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 6:21:24, time: 12.925, data_time: 5.568, memory: 6986, keypoints3d_loss: 0.2497, keypoints2d_loss: 0.0767, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2783, loss: 0.6047
+2023-07-22 02:23:26,605 - mmhuman3d - INFO - Epoch [5][350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 4:57:43, time: 12.559, data_time: 11.925, memory: 6986, keypoints3d_loss: 0.2402, keypoints2d_loss: 0.0738, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2784, loss: 0.5924
+2023-07-22 02:34:01,890 - mmhuman3d - INFO - Epoch [5][400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 3:57:08, time: 12.705, data_time: 12.073, memory: 6986, keypoints3d_loss: 0.2424, keypoints2d_loss: 0.0729, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2776, loss: 0.5928
+2023-07-22 02:44:47,013 - mmhuman3d - INFO - Epoch [5][450/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 3:25:26, time: 12.903, data_time: 11.040, memory: 6986, keypoints3d_loss: 0.2377, keypoints2d_loss: 0.0711, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2781, loss: 0.5869
+2023-07-22 02:55:39,186 - mmhuman3d - INFO - Epoch [5][500/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 3:13:25, time: 13.043, data_time: 11.671, memory: 6986, keypoints3d_loss: 0.2378, keypoints2d_loss: 0.0697, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2783, loss: 0.5857
+2023-07-22 03:06:11,946 - mmhuman3d - INFO - Epoch [5][550/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 2:09:56, time: 12.656, data_time: 5.267, memory: 6986, keypoints3d_loss: 0.2384, keypoints2d_loss: 0.0715, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2770, loss: 0.5869
+2023-07-22 03:17:21,140 - mmhuman3d - INFO - Epoch [5][600/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 2:43:22, time: 13.383, data_time: 4.386, memory: 6986, keypoints3d_loss: 0.2373, keypoints2d_loss: 0.0762, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2785, loss: 0.5920
+2023-07-22 03:27:59,839 - mmhuman3d - INFO - Epoch [5][650/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 1:57:05, time: 12.775, data_time: 0.157, memory: 6986, keypoints3d_loss: 0.2331, keypoints2d_loss: 0.0709, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2781, loss: 0.5821
+2023-07-22 03:38:54,436 - mmhuman3d - INFO - Epoch [5][700/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 1:52:06, time: 13.092, data_time: 0.521, memory: 6986, keypoints3d_loss: 0.2378, keypoints2d_loss: 0.0710, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2792, loss: 0.5880
+2023-07-22 03:49:44,030 - mmhuman3d - INFO - Epoch [5][750/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 1:34:29, time: 12.992, data_time: 10.674, memory: 6986, keypoints3d_loss: 0.2278, keypoints2d_loss: 0.0731, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2784, loss: 0.5792
+2023-07-22 04:00:59,346 - mmhuman3d - INFO - Epoch [5][800/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 2:20:12, time: 13.506, data_time: 12.876, memory: 6986, keypoints3d_loss: 0.2391, keypoints2d_loss: 0.0727, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2789, loss: 0.5907
+2023-07-22 04:11:11,335 - mmhuman3d - INFO - Epoch [5][850/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 0:31:04, time: 12.240, data_time: 8.026, memory: 6986, keypoints3d_loss: 0.2452, keypoints2d_loss: 0.0735, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2793, loss: 0.5980
+2023-07-22 04:21:54,801 - mmhuman3d - INFO - Epoch [5][900/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 23:59:42, time: 12.868, data_time: 2.958, memory: 6986, keypoints3d_loss: 0.2463, keypoints2d_loss: 0.0726, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2778, loss: 0.5967
+2023-07-22 04:33:05,895 - mmhuman3d - INFO - Epoch [5][950/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 0:34:04, time: 13.423, data_time: 2.486, memory: 6986, keypoints3d_loss: 0.2442, keypoints2d_loss: 0.0708, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2776, loss: 0.5926
+2023-07-22 04:43:54,430 - mmhuman3d - INFO - Epoch [5][1000/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 0:14:49, time: 12.971, data_time: 0.018, memory: 6986, keypoints3d_loss: 0.2472, keypoints2d_loss: 0.0694, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2781, loss: 0.5947
+2023-07-22 04:55:00,430 - mmhuman3d - INFO - Epoch [5][1050/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 0:35:27, time: 13.319, data_time: 0.017, memory: 6986, keypoints3d_loss: 0.2293, keypoints2d_loss: 0.0662, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2780, loss: 0.5734
+2023-07-22 05:05:49,476 - mmhuman3d - INFO - Epoch [5][1100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 0:17:25, time: 12.982, data_time: 1.415, memory: 6986, keypoints3d_loss: 0.2367, keypoints2d_loss: 0.0698, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2784, loss: 0.5849
+2023-07-22 05:16:54,396 - mmhuman3d - INFO - Epoch [5][1150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 0:34:25, time: 13.297, data_time: 0.863, memory: 6986, keypoints3d_loss: 0.2436, keypoints2d_loss: 0.0738, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2795, loss: 0.5969
+2023-07-22 05:28:00,402 - mmhuman3d - INFO - Epoch [5][1200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 0:53:15, time: 13.321, data_time: 0.020, memory: 6986, keypoints3d_loss: 0.2265, keypoints2d_loss: 0.0682, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2792, loss: 0.5739
+2023-07-22 05:38:41,626 - mmhuman3d - INFO - Epoch [5][1250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 72 days, 0:17:44, time: 12.824, data_time: 0.024, memory: 6986, keypoints3d_loss: 0.2341, keypoints2d_loss: 0.0698, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2789, loss: 0.5827
+2023-07-22 05:49:03,879 - mmhuman3d - INFO - Epoch [5][1300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 23:02:02, time: 12.439, data_time: 4.518, memory: 6986, keypoints3d_loss: 0.2440, keypoints2d_loss: 0.0740, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2786, loss: 0.5965
+2023-07-22 05:59:50,804 - mmhuman3d - INFO - Epoch [5][1350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 22:41:09, time: 12.946, data_time: 2.037, memory: 6986, keypoints3d_loss: 0.2458, keypoints2d_loss: 0.0723, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2802, loss: 0.5983
+2023-07-22 06:10:53,876 - mmhuman3d - INFO - Epoch [5][1400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 22:53:12, time: 13.261, data_time: 0.058, memory: 6986, keypoints3d_loss: 0.2337, keypoints2d_loss: 0.0735, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2790, loss: 0.5862
+2023-07-22 06:21:29,987 - mmhuman3d - INFO - Epoch [5][1450/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 22:09:33, time: 12.722, data_time: 10.073, memory: 6986, keypoints3d_loss: 0.2476, keypoints2d_loss: 0.0686, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2800, loss: 0.5962
+2023-07-22 06:32:27,421 - mmhuman3d - INFO - Epoch [5][1500/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 22:09:48, time: 13.149, data_time: 1.286, memory: 6986, keypoints3d_loss: 0.2437, keypoints2d_loss: 0.0734, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2791, loss: 0.5962
+2023-07-22 06:43:10,828 - mmhuman3d - INFO - Epoch [5][1550/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 21:41:41, time: 12.867, data_time: 4.696, memory: 6986, keypoints3d_loss: 0.2403, keypoints2d_loss: 0.0743, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2808, loss: 0.5955
+2023-07-22 06:53:37,022 - mmhuman3d - INFO - Epoch [5][1600/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 20:40:17, time: 12.524, data_time: 0.923, memory: 6986, keypoints3d_loss: 0.2399, keypoints2d_loss: 0.0724, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2804, loss: 0.5928
+2023-07-22 07:06:00,106 - mmhuman3d - INFO - Epoch [5][1650/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 23:27:12, time: 14.863, data_time: 0.019, memory: 6986, keypoints3d_loss: 0.2290, keypoints2d_loss: 0.0701, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2795, loss: 0.5785
+2023-07-22 07:16:42,991 - mmhuman3d - INFO - Epoch [5][1700/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 22:57:32, time: 12.858, data_time: 0.102, memory: 6986, keypoints3d_loss: 0.2387, keypoints2d_loss: 0.0719, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2814, loss: 0.5920
+2023-07-22 07:27:16,384 - mmhuman3d - INFO - Epoch [5][1750/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 22:10:17, time: 12.668, data_time: 0.017, memory: 6986, keypoints3d_loss: 0.2270, keypoints2d_loss: 0.0735, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2784, loss: 0.5789
+2023-07-22 07:37:51,963 - mmhuman3d - INFO - Epoch [5][1800/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 21:28:00, time: 12.712, data_time: 0.017, memory: 6986, keypoints3d_loss: 0.2359, keypoints2d_loss: 0.0701, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2789, loss: 0.5849
+2023-07-22 07:48:43,220 - mmhuman3d - INFO - Epoch [5][1850/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 21:15:29, time: 13.025, data_time: 4.362, memory: 6986, keypoints3d_loss: 0.2349, keypoints2d_loss: 0.0656, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2793, loss: 0.5798
+2023-07-22 07:59:18,976 - mmhuman3d - INFO - Epoch [5][1900/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 20:34:36, time: 12.715, data_time: 7.305, memory: 6986, keypoints3d_loss: 0.2371, keypoints2d_loss: 0.0696, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2788, loss: 0.5856
+2023-07-22 08:09:57,988 - mmhuman3d - INFO - Epoch [5][1950/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 20:00:23, time: 12.781, data_time: 0.017, memory: 6986, keypoints3d_loss: 0.2302, keypoints2d_loss: 0.0719, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2801, loss: 0.5822
+2023-07-22 08:20:31,184 - mmhuman3d - INFO - Epoch [5][2000/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 19:16:12, time: 12.663, data_time: 0.016, memory: 6986, keypoints3d_loss: 0.2303, keypoints2d_loss: 0.0702, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2798, loss: 0.5803
+2023-07-22 08:31:08,974 - mmhuman3d - INFO - Epoch [5][2050/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 18:41:00, time: 12.756, data_time: 6.110, memory: 6986, keypoints3d_loss: 0.2238, keypoints2d_loss: 0.0683, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2793, loss: 0.5715
+2023-07-22 08:41:42,400 - mmhuman3d - INFO - Epoch [5][2100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 17:58:34, time: 12.667, data_time: 12.036, memory: 6986, keypoints3d_loss: 0.2328, keypoints2d_loss: 0.0700, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2791, loss: 0.5819
+2023-07-22 08:52:14,539 - mmhuman3d - INFO - Epoch [5][2150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 17:14:46, time: 12.644, data_time: 7.725, memory: 6986, keypoints3d_loss: 0.2280, keypoints2d_loss: 0.0686, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2800, loss: 0.5765
+2023-07-22 09:02:56,693 - mmhuman3d - INFO - Epoch [5][2200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 16:48:44, time: 12.843, data_time: 5.874, memory: 6986, keypoints3d_loss: 0.2356, keypoints2d_loss: 0.0736, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2797, loss: 0.5888
+2023-07-22 09:13:32,631 - mmhuman3d - INFO - Epoch [5][2250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 16:12:31, time: 12.719, data_time: 9.019, memory: 6986, keypoints3d_loss: 0.2401, keypoints2d_loss: 0.0686, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2800, loss: 0.5886
+2023-07-22 09:24:05,790 - mmhuman3d - INFO - Epoch [5][2300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 15:32:06, time: 12.662, data_time: 11.574, memory: 6986, keypoints3d_loss: 0.2411, keypoints2d_loss: 0.0718, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2800, loss: 0.5930
+2023-07-22 09:34:36,072 - mmhuman3d - INFO - Epoch [5][2350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 14:47:42, time: 12.606, data_time: 11.834, memory: 6986, keypoints3d_loss: 0.2218, keypoints2d_loss: 0.0689, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2802, loss: 0.5709
+2023-07-22 09:45:40,136 - mmhuman3d - INFO - Epoch [5][2400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 14:59:17, time: 13.281, data_time: 12.648, memory: 6986, keypoints3d_loss: 0.2300, keypoints2d_loss: 0.0699, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2805, loss: 0.5803
+2023-07-22 09:54:01,491 - mmhuman3d - INFO - Saving checkpoint at 5 epochs
+2023-07-22 10:04:33,534 - mmhuman3d - INFO - Epoch [6][50/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 0:32:31, time: 12.620, data_time: 11.417, memory: 6986, keypoints3d_loss: 0.2284, keypoints2d_loss: 0.0691, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2793, loss: 0.5767
+2023-07-22 10:15:22,395 - mmhuman3d - INFO - Epoch [6][100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 71 days, 0:27:38, time: 12.977, data_time: 11.507, memory: 6986, keypoints3d_loss: 0.2332, keypoints2d_loss: 0.0693, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2796, loss: 0.5821
+2023-07-22 10:25:43,852 - mmhuman3d - INFO - Epoch [6][150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 23:39:26, time: 12.429, data_time: 11.801, memory: 6986, keypoints3d_loss: 0.2264, keypoints2d_loss: 0.0689, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2803, loss: 0.5756
+2023-07-22 10:36:28,082 - mmhuman3d - INFO - Epoch [6][200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 23:27:31, time: 12.885, data_time: 11.963, memory: 6986, keypoints3d_loss: 0.2281, keypoints2d_loss: 0.0683, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2811, loss: 0.5775
+2023-07-22 10:47:06,475 - mmhuman3d - INFO - Epoch [6][250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 23:06:36, time: 12.768, data_time: 11.706, memory: 6986, keypoints3d_loss: 0.2159, keypoints2d_loss: 0.0663, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2794, loss: 0.5615
+2023-07-22 10:57:37,074 - mmhuman3d - INFO - Epoch [6][300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 22:33:57, time: 12.612, data_time: 10.226, memory: 6986, keypoints3d_loss: 0.2322, keypoints2d_loss: 0.0663, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2808, loss: 0.5793
+2023-07-22 11:08:21,511 - mmhuman3d - INFO - Epoch [6][350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 22:22:41, time: 12.888, data_time: 11.083, memory: 6986, keypoints3d_loss: 0.2456, keypoints2d_loss: 0.0748, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2805, loss: 0.6009
+2023-07-22 11:18:47,275 - mmhuman3d - INFO - Epoch [6][400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 21:43:26, time: 12.515, data_time: 5.679, memory: 6986, keypoints3d_loss: 0.2261, keypoints2d_loss: 0.0720, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2803, loss: 0.5784
+2023-07-22 11:29:15,355 - mmhuman3d - INFO - Epoch [6][450/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 21:08:10, time: 12.562, data_time: 4.355, memory: 6986, keypoints3d_loss: 0.2173, keypoints2d_loss: 0.0661, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2797, loss: 0.5632
+2023-07-22 11:39:50,607 - mmhuman3d - INFO - Epoch [6][500/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 20:43:55, time: 12.705, data_time: 9.077, memory: 6986, keypoints3d_loss: 0.2247, keypoints2d_loss: 0.0664, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2812, loss: 0.5723
+2023-07-22 11:50:18,471 - mmhuman3d - INFO - Epoch [6][550/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 20:09:08, time: 12.557, data_time: 8.816, memory: 6986, keypoints3d_loss: 0.2256, keypoints2d_loss: 0.0701, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2808, loss: 0.5765
+2023-07-22 12:00:57,295 - mmhuman3d - INFO - Epoch [6][600/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 19:50:37, time: 12.776, data_time: 3.554, memory: 6986, keypoints3d_loss: 0.2229, keypoints2d_loss: 0.0682, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2809, loss: 0.5721
+2023-07-22 12:11:44,334 - mmhuman3d - INFO - Epoch [6][650/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 19:44:01, time: 12.941, data_time: 0.072, memory: 6986, keypoints3d_loss: 0.2275, keypoints2d_loss: 0.0681, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2800, loss: 0.5755
+2023-07-22 12:22:28,408 - mmhuman3d - INFO - Epoch [6][700/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 19:33:10, time: 12.882, data_time: 8.366, memory: 6986, keypoints3d_loss: 0.2239, keypoints2d_loss: 0.0681, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2796, loss: 0.5716
+2023-07-22 12:33:13,106 - mmhuman3d - INFO - Epoch [6][750/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 19:23:10, time: 12.894, data_time: 6.637, memory: 6986, keypoints3d_loss: 0.2110, keypoints2d_loss: 0.0655, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2803, loss: 0.5568
+2023-07-22 12:43:31,826 - mmhuman3d - INFO - Epoch [6][800/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 18:36:57, time: 12.374, data_time: 0.522, memory: 6986, keypoints3d_loss: 0.2176, keypoints2d_loss: 0.0655, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2811, loss: 0.5642
+2023-07-22 12:53:56,239 - mmhuman3d - INFO - Epoch [6][850/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 17:59:13, time: 12.488, data_time: 3.344, memory: 6986, keypoints3d_loss: 0.2170, keypoints2d_loss: 0.0676, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2808, loss: 0.5654
+2023-07-22 13:04:27,899 - mmhuman3d - INFO - Epoch [6][900/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 17:31:51, time: 12.633, data_time: 10.490, memory: 6986, keypoints3d_loss: 0.2180, keypoints2d_loss: 0.0701, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2805, loss: 0.5687
+2023-07-22 13:14:53,059 - mmhuman3d - INFO - Epoch [6][950/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 16:56:03, time: 12.504, data_time: 0.753, memory: 6986, keypoints3d_loss: 0.2285, keypoints2d_loss: 0.0669, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2814, loss: 0.5768
+2023-07-22 13:25:16,646 - mmhuman3d - INFO - Epoch [6][1000/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 16:18:29, time: 12.471, data_time: 6.349, memory: 6986, keypoints3d_loss: 0.2144, keypoints2d_loss: 0.0702, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2813, loss: 0.5659
+2023-07-22 13:35:48,582 - mmhuman3d - INFO - Epoch [6][1050/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 15:52:30, time: 12.638, data_time: 0.159, memory: 6986, keypoints3d_loss: 0.2118, keypoints2d_loss: 0.0659, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2810, loss: 0.5586
+2023-07-22 13:46:02,431 - mmhuman3d - INFO - Epoch [6][1100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 15:02:54, time: 12.277, data_time: 2.203, memory: 6986, keypoints3d_loss: 0.2220, keypoints2d_loss: 0.0702, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2795, loss: 0.5717
+2023-07-22 13:56:21,422 - mmhuman3d - INFO - Epoch [6][1150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 14:20:43, time: 12.380, data_time: 6.782, memory: 6986, keypoints3d_loss: 0.2257, keypoints2d_loss: 0.0651, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2806, loss: 0.5714
+2023-07-22 14:06:54,185 - mmhuman3d - INFO - Epoch [6][1200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 13:56:53, time: 12.654, data_time: 6.877, memory: 6986, keypoints3d_loss: 0.2265, keypoints2d_loss: 0.0660, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2796, loss: 0.5720
+2023-07-22 14:17:13,029 - mmhuman3d - INFO - Epoch [6][1250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 13:15:25, time: 12.378, data_time: 5.084, memory: 6986, keypoints3d_loss: 0.2204, keypoints2d_loss: 0.0631, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2796, loss: 0.5631
+2023-07-22 14:27:40,092 - mmhuman3d - INFO - Epoch [6][1300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 12:44:52, time: 12.540, data_time: 10.809, memory: 6986, keypoints3d_loss: 0.2111, keypoints2d_loss: 0.0652, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2808, loss: 0.5571
+2023-07-22 14:38:05,000 - mmhuman3d - INFO - Epoch [6][1350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 12:12:00, time: 12.499, data_time: 11.865, memory: 6986, keypoints3d_loss: 0.2165, keypoints2d_loss: 0.0667, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2800, loss: 0.5632
+2023-07-22 14:48:35,575 - mmhuman3d - INFO - Epoch [6][1400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 11:46:36, time: 12.612, data_time: 11.983, memory: 6986, keypoints3d_loss: 0.2233, keypoints2d_loss: 0.0674, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2805, loss: 0.5712
+2023-07-22 14:59:16,098 - mmhuman3d - INFO - Epoch [6][1450/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 11:33:50, time: 12.810, data_time: 12.180, memory: 6986, keypoints3d_loss: 0.2179, keypoints2d_loss: 0.0680, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2805, loss: 0.5664
+2023-07-22 15:09:56,958 - mmhuman3d - INFO - Epoch [6][1500/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 11:21:32, time: 12.817, data_time: 12.162, memory: 6986, keypoints3d_loss: 0.2247, keypoints2d_loss: 0.0661, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2803, loss: 0.5711
+2023-07-22 15:20:07,112 - mmhuman3d - INFO - Epoch [6][1550/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 10:31:30, time: 12.203, data_time: 11.569, memory: 6986, keypoints3d_loss: 0.2183, keypoints2d_loss: 0.0695, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2809, loss: 0.5687
+2023-07-22 15:30:34,763 - mmhuman3d - INFO - Epoch [6][1600/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 10:03:25, time: 12.553, data_time: 11.922, memory: 6986, keypoints3d_loss: 0.2185, keypoints2d_loss: 0.0655, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2804, loss: 0.5644
+2023-07-22 15:41:02,464 - mmhuman3d - INFO - Epoch [6][1650/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 9:35:41, time: 12.554, data_time: 11.923, memory: 6986, keypoints3d_loss: 0.2283, keypoints2d_loss: 0.0675, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2805, loss: 0.5763
+2023-07-22 15:51:37,374 - mmhuman3d - INFO - Epoch [6][1700/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 9:16:52, time: 12.698, data_time: 12.067, memory: 6986, keypoints3d_loss: 0.2242, keypoints2d_loss: 0.0685, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2804, loss: 0.5731
+2023-07-22 16:02:02,825 - mmhuman3d - INFO - Epoch [6][1750/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 8:46:47, time: 12.507, data_time: 11.745, memory: 6986, keypoints3d_loss: 0.2106, keypoints2d_loss: 0.0670, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2799, loss: 0.5575
+2023-07-22 16:12:15,127 - mmhuman3d - INFO - Epoch [6][1800/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 8:01:39, time: 12.248, data_time: 11.557, memory: 6986, keypoints3d_loss: 0.2064, keypoints2d_loss: 0.0682, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2809, loss: 0.5554
+2023-07-22 16:22:51,050 - mmhuman3d - INFO - Epoch [6][1850/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 7:44:37, time: 12.718, data_time: 12.070, memory: 6986, keypoints3d_loss: 0.2068, keypoints2d_loss: 0.0642, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2813, loss: 0.5524
+2023-07-22 16:33:18,987 - mmhuman3d - INFO - Epoch [6][1900/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 7:18:27, time: 12.559, data_time: 11.925, memory: 6986, keypoints3d_loss: 0.2080, keypoints2d_loss: 0.0637, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2804, loss: 0.5521
+2023-07-22 16:43:35,456 - mmhuman3d - INFO - Epoch [6][1950/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 6:39:14, time: 12.330, data_time: 11.697, memory: 6986, keypoints3d_loss: 0.2019, keypoints2d_loss: 0.0637, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2810, loss: 0.5466
+2023-07-22 16:53:59,769 - mmhuman3d - INFO - Epoch [6][2000/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 6:09:28, time: 12.487, data_time: 11.291, memory: 6986, keypoints3d_loss: 0.2091, keypoints2d_loss: 0.0642, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2816, loss: 0.5549
+2023-07-22 17:04:31,344 - mmhuman3d - INFO - Epoch [6][2050/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 5:48:11, time: 12.631, data_time: 11.356, memory: 6986, keypoints3d_loss: 0.2168, keypoints2d_loss: 0.0668, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2809, loss: 0.5645
+2023-07-22 17:14:55,696 - mmhuman3d - INFO - Epoch [6][2100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 5:18:58, time: 12.488, data_time: 5.489, memory: 6986, keypoints3d_loss: 0.2010, keypoints2d_loss: 0.0644, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2812, loss: 0.5466
+2023-07-22 17:25:06,613 - mmhuman3d - INFO - Epoch [6][2150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 4:34:54, time: 12.218, data_time: 2.049, memory: 6986, keypoints3d_loss: 0.2050, keypoints2d_loss: 0.0663, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2808, loss: 0.5521
+2023-07-22 17:35:26,447 - mmhuman3d - INFO - Epoch [6][2200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 4:01:12, time: 12.396, data_time: 3.561, memory: 6986, keypoints3d_loss: 0.2348, keypoints2d_loss: 0.0746, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2817, loss: 0.5910
+2023-07-22 17:45:35,575 - mmhuman3d - INFO - Epoch [6][2250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 3:15:59, time: 12.182, data_time: 2.098, memory: 6986, keypoints3d_loss: 0.2158, keypoints2d_loss: 0.0656, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2814, loss: 0.5628
+2023-07-22 17:55:53,992 - mmhuman3d - INFO - Epoch [6][2300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 2:41:32, time: 12.369, data_time: 0.042, memory: 6986, keypoints3d_loss: 0.2204, keypoints2d_loss: 0.0660, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2806, loss: 0.5671
+2023-07-22 18:06:30,729 - mmhuman3d - INFO - Epoch [6][2350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 2:27:25, time: 12.735, data_time: 0.081, memory: 6986, keypoints3d_loss: 0.2095, keypoints2d_loss: 0.0619, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2818, loss: 0.5532
+2023-07-22 18:16:28,397 - mmhuman3d - INFO - Epoch [6][2400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 70 days, 1:30:55, time: 11.952, data_time: 0.046, memory: 6986, keypoints3d_loss: 0.2086, keypoints2d_loss: 0.0682, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2814, loss: 0.5582
+2023-07-22 18:24:36,846 - mmhuman3d - INFO - Saving checkpoint at 6 epochs
+2023-07-22 18:35:33,950 - mmhuman3d - INFO - Epoch [7][50/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 16:35:32, time: 13.121, data_time: 12.399, memory: 6986, keypoints3d_loss: 0.2059, keypoints2d_loss: 0.0660, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2815, loss: 0.5534
+2023-07-22 18:45:49,768 - mmhuman3d - INFO - Epoch [7][100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 16:03:06, time: 12.316, data_time: 9.353, memory: 6986, keypoints3d_loss: 0.2134, keypoints2d_loss: 0.0674, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2824, loss: 0.5633
+2023-07-22 18:56:07,849 - mmhuman3d - INFO - Epoch [7][150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 15:33:22, time: 12.362, data_time: 11.623, memory: 6986, keypoints3d_loss: 0.2180, keypoints2d_loss: 0.0662, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2809, loss: 0.5651
+2023-07-22 19:06:30,043 - mmhuman3d - INFO - Epoch [7][200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 15:08:11, time: 12.444, data_time: 10.019, memory: 6986, keypoints3d_loss: 0.2257, keypoints2d_loss: 0.0668, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2822, loss: 0.5747
+2023-07-22 19:16:50,933 - mmhuman3d - INFO - Epoch [7][250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 14:41:52, time: 12.418, data_time: 11.584, memory: 6986, keypoints3d_loss: 0.2102, keypoints2d_loss: 0.0664, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2808, loss: 0.5575
+2023-07-22 19:26:59,805 - mmhuman3d - INFO - Epoch [7][300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 14:03:18, time: 12.177, data_time: 11.454, memory: 6986, keypoints3d_loss: 0.2103, keypoints2d_loss: 0.0640, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2818, loss: 0.5561
+2023-07-22 19:37:28,145 - mmhuman3d - INFO - Epoch [7][350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 13:45:07, time: 12.566, data_time: 11.627, memory: 6986, keypoints3d_loss: 0.2034, keypoints2d_loss: 0.0646, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2813, loss: 0.5493
+2023-07-22 19:47:53,205 - mmhuman3d - INFO - Epoch [7][400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 13:23:42, time: 12.502, data_time: 8.658, memory: 6986, keypoints3d_loss: 0.2094, keypoints2d_loss: 0.0653, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2816, loss: 0.5564
+2023-07-22 19:57:52,012 - mmhuman3d - INFO - Epoch [7][450/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 12:35:47, time: 11.976, data_time: 10.423, memory: 6986, keypoints3d_loss: 0.2131, keypoints2d_loss: 0.0674, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2818, loss: 0.5623
+2023-07-22 20:07:58,726 - mmhuman3d - INFO - Epoch [7][500/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 11:56:19, time: 12.134, data_time: 11.386, memory: 6986, keypoints3d_loss: 0.2088, keypoints2d_loss: 0.0629, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2809, loss: 0.5525
+2023-07-22 20:18:19,095 - mmhuman3d - INFO - Epoch [7][550/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 11:30:54, time: 12.407, data_time: 9.870, memory: 6986, keypoints3d_loss: 0.2103, keypoints2d_loss: 0.0672, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2822, loss: 0.5597
+2023-07-22 20:28:42,651 - mmhuman3d - INFO - Epoch [7][600/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 11:08:47, time: 12.470, data_time: 11.840, memory: 6986, keypoints3d_loss: 0.1961, keypoints2d_loss: 0.0617, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2817, loss: 0.5394
+2023-07-22 20:38:59,102 - mmhuman3d - INFO - Epoch [7][650/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 10:39:54, time: 12.330, data_time: 11.699, memory: 6986, keypoints3d_loss: 0.2011, keypoints2d_loss: 0.0612, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2802, loss: 0.5425
+2023-07-22 20:49:02,840 - mmhuman3d - INFO - Epoch [7][700/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 9:58:41, time: 12.074, data_time: 11.315, memory: 6986, keypoints3d_loss: 0.2058, keypoints2d_loss: 0.0650, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2819, loss: 0.5527
+2023-07-22 20:59:07,422 - mmhuman3d - INFO - Epoch [7][750/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 9:18:43, time: 12.092, data_time: 7.113, memory: 6986, keypoints3d_loss: 0.2127, keypoints2d_loss: 0.0633, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2806, loss: 0.5566
+2023-07-22 21:09:23,154 - mmhuman3d - INFO - Epoch [7][800/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 8:49:56, time: 12.315, data_time: 11.689, memory: 6986, keypoints3d_loss: 0.2132, keypoints2d_loss: 0.0645, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2825, loss: 0.5602
+2023-07-22 21:19:54,936 - mmhuman3d - INFO - Epoch [7][850/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 8:36:50, time: 12.636, data_time: 10.430, memory: 6986, keypoints3d_loss: 0.2000, keypoints2d_loss: 0.0591, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2812, loss: 0.5404
+2023-07-22 21:30:32,160 - mmhuman3d - INFO - Epoch [7][900/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 8:28:57, time: 12.744, data_time: 2.474, memory: 6986, keypoints3d_loss: 0.2039, keypoints2d_loss: 0.0647, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2813, loss: 0.5498
+2023-07-22 21:40:49,813 - mmhuman3d - INFO - Epoch [7][950/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 8:02:28, time: 12.354, data_time: 7.296, memory: 6986, keypoints3d_loss: 0.2066, keypoints2d_loss: 0.0659, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2815, loss: 0.5540
+2023-07-22 21:51:29,275 - mmhuman3d - INFO - Epoch [7][1000/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 7:56:46, time: 12.789, data_time: 12.161, memory: 6986, keypoints3d_loss: 0.2049, keypoints2d_loss: 0.0606, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2823, loss: 0.5478
+2023-07-22 22:01:58,826 - mmhuman3d - INFO - Epoch [7][1050/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 7:41:42, time: 12.591, data_time: 11.969, memory: 6986, keypoints3d_loss: 0.2029, keypoints2d_loss: 0.0620, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2815, loss: 0.5464
+2023-07-22 22:12:29,474 - mmhuman3d - INFO - Epoch [7][1100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 7:27:43, time: 12.613, data_time: 11.985, memory: 6986, keypoints3d_loss: 0.2042, keypoints2d_loss: 0.0623, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2818, loss: 0.5483
+2023-07-22 22:22:50,973 - mmhuman3d - INFO - Epoch [7][1150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 7:05:14, time: 12.429, data_time: 2.517, memory: 6986, keypoints3d_loss: 0.2078, keypoints2d_loss: 0.0607, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2817, loss: 0.5502
+2023-07-22 22:33:04,813 - mmhuman3d - INFO - Epoch [7][1200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 6:35:53, time: 12.278, data_time: 11.231, memory: 6986, keypoints3d_loss: 0.2029, keypoints2d_loss: 0.0611, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2814, loss: 0.5454
+2023-07-22 22:43:11,563 - mmhuman3d - INFO - Epoch [7][1250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 6:00:13, time: 12.135, data_time: 11.113, memory: 6986, keypoints3d_loss: 0.2180, keypoints2d_loss: 0.0675, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2822, loss: 0.5676
+2023-07-22 22:53:01,479 - mmhuman3d - INFO - Epoch [7][1300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 5:09:29, time: 11.798, data_time: 11.113, memory: 6986, keypoints3d_loss: 0.2077, keypoints2d_loss: 0.0643, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2818, loss: 0.5539
+2023-07-22 23:03:34,839 - mmhuman3d - INFO - Epoch [7][1350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 4:58:35, time: 12.666, data_time: 4.574, memory: 6986, keypoints3d_loss: 0.1982, keypoints2d_loss: 0.0628, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2819, loss: 0.5429
+2023-07-22 23:14:05,746 - mmhuman3d - INFO - Epoch [7][1400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 4:45:35, time: 12.619, data_time: 11.731, memory: 6986, keypoints3d_loss: 0.2001, keypoints2d_loss: 0.0632, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2816, loss: 0.5449
+2023-07-22 23:24:54,513 - mmhuman3d - INFO - Epoch [7][1450/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 4:48:34, time: 12.975, data_time: 4.254, memory: 6986, keypoints3d_loss: 0.2043, keypoints2d_loss: 0.0612, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2824, loss: 0.5479
+2023-07-22 23:35:37,095 - mmhuman3d - INFO - Epoch [7][1500/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 4:45:53, time: 12.852, data_time: 2.487, memory: 6986, keypoints3d_loss: 0.2060, keypoints2d_loss: 0.0643, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2821, loss: 0.5524
+2023-07-22 23:45:52,500 - mmhuman3d - INFO - Epoch [7][1550/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 4:19:02, time: 12.308, data_time: 0.438, memory: 6986, keypoints3d_loss: 0.2089, keypoints2d_loss: 0.0637, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2812, loss: 0.5538
+2023-07-22 23:56:37,443 - mmhuman3d - INFO - Epoch [7][1600/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 4:18:22, time: 12.898, data_time: 4.813, memory: 6986, keypoints3d_loss: 0.1882, keypoints2d_loss: 0.0618, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2816, loss: 0.5315
+2023-07-23 00:06:58,614 - mmhuman3d - INFO - Epoch [7][1650/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 3:56:48, time: 12.424, data_time: 0.091, memory: 6986, keypoints3d_loss: 0.2026, keypoints2d_loss: 0.0634, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2816, loss: 0.5477
+2023-07-23 00:17:22,115 - mmhuman3d - INFO - Epoch [7][1700/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 3:37:20, time: 12.469, data_time: 0.194, memory: 6986, keypoints3d_loss: 0.2128, keypoints2d_loss: 0.0645, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2837, loss: 0.5610
+2023-07-23 00:27:44,441 - mmhuman3d - INFO - Epoch [7][1750/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 3:16:58, time: 12.446, data_time: 6.650, memory: 6986, keypoints3d_loss: 0.1930, keypoints2d_loss: 0.0619, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2820, loss: 0.5369
+2023-07-23 00:38:33,804 - mmhuman3d - INFO - Epoch [7][1800/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 3:20:04, time: 12.988, data_time: 12.357, memory: 6986, keypoints3d_loss: 0.2041, keypoints2d_loss: 0.0649, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2820, loss: 0.5510
+2023-07-23 00:48:54,704 - mmhuman3d - INFO - Epoch [7][1850/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 2:58:35, time: 12.418, data_time: 11.788, memory: 6986, keypoints3d_loss: 0.2047, keypoints2d_loss: 0.0615, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2809, loss: 0.5472
+2023-07-23 00:59:05,420 - mmhuman3d - INFO - Epoch [7][1900/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 2:28:33, time: 12.215, data_time: 9.973, memory: 6986, keypoints3d_loss: 0.2136, keypoints2d_loss: 0.0641, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2813, loss: 0.5591
+2023-07-23 01:09:11,529 - mmhuman3d - INFO - Epoch [7][1950/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 1:54:49, time: 12.122, data_time: 10.000, memory: 6986, keypoints3d_loss: 0.2005, keypoints2d_loss: 0.0632, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2812, loss: 0.5449
+2023-07-23 01:19:55,132 - mmhuman3d - INFO - Epoch [7][2000/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 1:52:56, time: 12.872, data_time: 12.243, memory: 6986, keypoints3d_loss: 0.2024, keypoints2d_loss: 0.0614, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2813, loss: 0.5451
+2023-07-23 01:30:00,865 - mmhuman3d - INFO - Epoch [7][2050/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 1:19:13, time: 12.115, data_time: 11.484, memory: 6986, keypoints3d_loss: 0.2009, keypoints2d_loss: 0.0653, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2824, loss: 0.5487
+2023-07-23 01:40:19,022 - mmhuman3d - INFO - Epoch [7][2100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 0:56:07, time: 12.363, data_time: 1.863, memory: 6986, keypoints3d_loss: 0.1998, keypoints2d_loss: 0.0620, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2814, loss: 0.5432
+2023-07-23 01:51:04,905 - mmhuman3d - INFO - Epoch [7][2150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 0:56:06, time: 12.917, data_time: 0.300, memory: 6986, keypoints3d_loss: 0.2440, keypoints2d_loss: 0.0741, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2821, loss: 0.6002
+2023-07-23 02:01:21,442 - mmhuman3d - INFO - Epoch [7][2200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 0:31:50, time: 12.332, data_time: 1.576, memory: 6986, keypoints3d_loss: 0.2193, keypoints2d_loss: 0.0689, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2822, loss: 0.5704
+2023-07-23 02:12:04,336 - mmhuman3d - INFO - Epoch [7][2250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 69 days, 0:29:13, time: 12.856, data_time: 0.666, memory: 6986, keypoints3d_loss: 0.2039, keypoints2d_loss: 0.0627, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2818, loss: 0.5484
+2023-07-23 02:21:55,498 - mmhuman3d - INFO - Epoch [7][2300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 23:44:26, time: 11.824, data_time: 0.482, memory: 6986, keypoints3d_loss: 0.1990, keypoints2d_loss: 0.0659, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2819, loss: 0.5468
+2023-07-23 02:32:12,720 - mmhuman3d - INFO - Epoch [7][2350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 23:21:09, time: 12.346, data_time: 0.018, memory: 6986, keypoints3d_loss: 0.2003, keypoints2d_loss: 0.0638, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2809, loss: 0.5451
+2023-07-23 02:42:25,266 - mmhuman3d - INFO - Epoch [7][2400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 22:54:12, time: 12.251, data_time: 0.017, memory: 6986, keypoints3d_loss: 0.2037, keypoints2d_loss: 0.0621, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2820, loss: 0.5478
+2023-07-23 02:50:11,699 - mmhuman3d - INFO - Saving checkpoint at 7 epochs
+2023-07-23 03:01:09,752 - mmhuman3d - INFO - Epoch [8][50/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 16:19:59, time: 13.140, data_time: 1.047, memory: 6986, keypoints3d_loss: 0.1899, keypoints2d_loss: 0.0597, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2821, loss: 0.5316
+2023-07-23 03:11:39,782 - mmhuman3d - INFO - Epoch [8][100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 16:09:15, time: 12.601, data_time: 0.016, memory: 6986, keypoints3d_loss: 0.1895, keypoints2d_loss: 0.0610, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2816, loss: 0.5321
+2023-07-23 03:21:51,506 - mmhuman3d - INFO - Epoch [8][150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 15:43:55, time: 12.233, data_time: 1.589, memory: 6986, keypoints3d_loss: 0.1923, keypoints2d_loss: 0.0628, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2808, loss: 0.5360
+2023-07-23 03:32:27,656 - mmhuman3d - INFO - Epoch [8][200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 15:38:06, time: 12.724, data_time: 7.718, memory: 6986, keypoints3d_loss: 0.1879, keypoints2d_loss: 0.0607, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2821, loss: 0.5307
+2023-07-23 03:42:32,648 - mmhuman3d - INFO - Epoch [8][250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 15:07:45, time: 12.100, data_time: 11.326, memory: 6986, keypoints3d_loss: 0.1870, keypoints2d_loss: 0.0613, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2821, loss: 0.5304
+2023-07-23 03:52:21,902 - mmhuman3d - INFO - Epoch [8][300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 14:25:21, time: 11.785, data_time: 5.993, memory: 6986, keypoints3d_loss: 0.1851, keypoints2d_loss: 0.0585, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2816, loss: 0.5253
+2023-07-23 04:02:17,666 - mmhuman3d - INFO - Epoch [8][350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 13:48:15, time: 11.914, data_time: 9.305, memory: 6986, keypoints3d_loss: 0.1987, keypoints2d_loss: 0.0628, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2813, loss: 0.5428
+2023-07-23 04:12:26,902 - mmhuman3d - INFO - Epoch [8][400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 13:21:53, time: 12.185, data_time: 0.355, memory: 6986, keypoints3d_loss: 0.2037, keypoints2d_loss: 0.0627, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2824, loss: 0.5488
+2023-07-23 04:22:38,125 - mmhuman3d - INFO - Epoch [8][450/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 12:57:15, time: 12.226, data_time: 7.567, memory: 6986, keypoints3d_loss: 0.1890, keypoints2d_loss: 0.0590, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2811, loss: 0.5291
+2023-07-23 04:33:32,298 - mmhuman3d - INFO - Epoch [8][500/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 13:05:32, time: 13.084, data_time: 12.457, memory: 6986, keypoints3d_loss: 0.1934, keypoints2d_loss: 0.0599, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2826, loss: 0.5359
+2023-07-23 04:43:29,194 - mmhuman3d - INFO - Epoch [8][550/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 12:30:02, time: 11.937, data_time: 10.787, memory: 6986, keypoints3d_loss: 0.1947, keypoints2d_loss: 0.0596, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2818, loss: 0.5362
+2023-07-23 04:53:53,191 - mmhuman3d - INFO - Epoch [8][600/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 12:15:21, time: 12.480, data_time: 1.119, memory: 6986, keypoints3d_loss: 0.1896, keypoints2d_loss: 0.0622, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2821, loss: 0.5339
+2023-07-23 05:03:56,169 - mmhuman3d - INFO - Epoch [8][650/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 11:44:52, time: 12.060, data_time: 9.629, memory: 6986, keypoints3d_loss: 0.1903, keypoints2d_loss: 0.0610, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2822, loss: 0.5334
+2023-07-23 05:13:52,816 - mmhuman3d - INFO - Epoch [8][700/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 11:09:46, time: 11.931, data_time: 4.475, memory: 6986, keypoints3d_loss: 0.2000, keypoints2d_loss: 0.0612, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2826, loss: 0.5438
+2023-07-23 05:24:00,120 - mmhuman3d - INFO - Epoch [8][750/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 10:42:57, time: 12.147, data_time: 0.028, memory: 6986, keypoints3d_loss: 0.1906, keypoints2d_loss: 0.0603, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2821, loss: 0.5329
+2023-07-23 05:33:49,349 - mmhuman3d - INFO - Epoch [8][800/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 10:02:51, time: 11.784, data_time: 3.629, memory: 6986, keypoints3d_loss: 0.1913, keypoints2d_loss: 0.0612, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2821, loss: 0.5346
+2023-07-23 05:43:54,056 - mmhuman3d - INFO - Epoch [8][850/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 9:34:27, time: 12.094, data_time: 4.954, memory: 6986, keypoints3d_loss: 0.1821, keypoints2d_loss: 0.0615, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2818, loss: 0.5253
+2023-07-23 05:54:05,178 - mmhuman3d - INFO - Epoch [8][900/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 9:10:55, time: 12.222, data_time: 0.041, memory: 6986, keypoints3d_loss: 0.1905, keypoints2d_loss: 0.0579, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2828, loss: 0.5313
+2023-07-23 06:04:00,480 - mmhuman3d - INFO - Epoch [8][950/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 8:35:57, time: 11.906, data_time: 0.542, memory: 6986, keypoints3d_loss: 0.1907, keypoints2d_loss: 0.0585, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2815, loss: 0.5307
+2023-07-23 06:14:15,150 - mmhuman3d - INFO - Epoch [8][1000/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 8:15:21, time: 12.294, data_time: 2.201, memory: 6986, keypoints3d_loss: 0.1931, keypoints2d_loss: 0.0604, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2817, loss: 0.5353
+2023-07-23 06:24:18,147 - mmhuman3d - INFO - Epoch [8][1050/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 7:46:18, time: 12.058, data_time: 8.044, memory: 6986, keypoints3d_loss: 0.1939, keypoints2d_loss: 0.0601, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2823, loss: 0.5363
+2023-07-23 06:34:14,301 - mmhuman3d - INFO - Epoch [8][1100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 7:12:38, time: 11.925, data_time: 2.399, memory: 6986, keypoints3d_loss: 0.1987, keypoints2d_loss: 0.0629, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2815, loss: 0.5432
+2023-07-23 06:44:08,771 - mmhuman3d - INFO - Epoch [8][1150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 6:37:53, time: 11.889, data_time: 7.704, memory: 6986, keypoints3d_loss: 0.1853, keypoints2d_loss: 0.0592, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2824, loss: 0.5270
+2023-07-23 06:54:10,079 - mmhuman3d - INFO - Epoch [8][1200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 6:08:16, time: 12.026, data_time: 2.098, memory: 6986, keypoints3d_loss: 0.1919, keypoints2d_loss: 0.0613, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2818, loss: 0.5349
+2023-07-23 07:04:23,057 - mmhuman3d - INFO - Epoch [8][1250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 5:47:07, time: 12.260, data_time: 7.061, memory: 6986, keypoints3d_loss: 0.1931, keypoints2d_loss: 0.0635, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2824, loss: 0.5390
+2023-07-23 07:14:16,977 - mmhuman3d - INFO - Epoch [8][1300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 5:12:35, time: 11.878, data_time: 11.180, memory: 6986, keypoints3d_loss: 0.1850, keypoints2d_loss: 0.0599, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2818, loss: 0.5267
+2023-07-23 07:24:14,692 - mmhuman3d - INFO - Epoch [8][1350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 4:40:56, time: 11.954, data_time: 11.006, memory: 6986, keypoints3d_loss: 0.1915, keypoints2d_loss: 0.0605, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2824, loss: 0.5344
+2023-07-23 07:34:42,936 - mmhuman3d - INFO - Epoch [8][1400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 4:30:54, time: 12.565, data_time: 11.651, memory: 6986, keypoints3d_loss: 0.1893, keypoints2d_loss: 0.0599, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2823, loss: 0.5315
+2023-07-23 07:44:50,701 - mmhuman3d - INFO - Epoch [8][1450/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 4:06:32, time: 12.154, data_time: 11.518, memory: 6986, keypoints3d_loss: 0.1844, keypoints2d_loss: 0.0621, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2815, loss: 0.5280
+2023-07-23 07:55:01,209 - mmhuman3d - INFO - Epoch [8][1500/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 3:44:15, time: 12.211, data_time: 6.861, memory: 6986, keypoints3d_loss: 0.1811, keypoints2d_loss: 0.0613, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2832, loss: 0.5257
+2023-07-23 08:04:54,782 - mmhuman3d - INFO - Epoch [8][1550/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 3:10:20, time: 11.871, data_time: 5.730, memory: 6986, keypoints3d_loss: 0.1748, keypoints2d_loss: 0.0577, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2825, loss: 0.5151
+2023-07-23 08:14:34,991 - mmhuman3d - INFO - Epoch [8][1600/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 2:27:24, time: 11.603, data_time: 9.907, memory: 6986, keypoints3d_loss: 0.1932, keypoints2d_loss: 0.0582, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2826, loss: 0.5340
+2023-07-23 08:24:40,659 - mmhuman3d - INFO - Epoch [8][1650/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 2:02:14, time: 12.113, data_time: 4.909, memory: 6986, keypoints3d_loss: 0.1848, keypoints2d_loss: 0.0598, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2830, loss: 0.5277
+2023-07-23 08:34:34,016 - mmhuman3d - INFO - Epoch [8][1700/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 1:28:51, time: 11.868, data_time: 7.988, memory: 6986, keypoints3d_loss: 0.1791, keypoints2d_loss: 0.0557, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2827, loss: 0.5175
+2023-07-23 08:44:38,003 - mmhuman3d - INFO - Epoch [8][1750/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 1:02:50, time: 12.079, data_time: 11.093, memory: 6986, keypoints3d_loss: 0.2024, keypoints2d_loss: 0.0614, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2821, loss: 0.5459
+2023-07-23 08:54:47,412 - mmhuman3d - INFO - Epoch [8][1800/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 0:40:37, time: 12.188, data_time: 10.061, memory: 6986, keypoints3d_loss: 0.1835, keypoints2d_loss: 0.0570, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2828, loss: 0.5233
+2023-07-23 09:04:48,900 - mmhuman3d - INFO - Epoch [8][1850/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 68 days, 0:13:13, time: 12.031, data_time: 1.894, memory: 6986, keypoints3d_loss: 0.1947, keypoints2d_loss: 0.0598, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2817, loss: 0.5363
+2023-07-23 09:15:03,273 - mmhuman3d - INFO - Epoch [8][1900/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 23:54:34, time: 12.288, data_time: 10.531, memory: 6986, keypoints3d_loss: 0.1805, keypoints2d_loss: 0.0570, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2824, loss: 0.5200
+2023-07-23 09:25:07,978 - mmhuman3d - INFO - Epoch [8][1950/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 23:29:30, time: 12.093, data_time: 2.056, memory: 6986, keypoints3d_loss: 0.1943, keypoints2d_loss: 0.0682, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2822, loss: 0.5447
+2023-07-23 09:35:03,231 - mmhuman3d - INFO - Epoch [8][2000/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 22:58:22, time: 11.906, data_time: 8.317, memory: 6986, keypoints3d_loss: 0.1952, keypoints2d_loss: 0.0612, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2826, loss: 0.5390
+2023-07-23 09:45:04,170 - mmhuman3d - INFO - Epoch [8][2050/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 22:31:08, time: 12.019, data_time: 3.854, memory: 6986, keypoints3d_loss: 0.1881, keypoints2d_loss: 0.0589, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2820, loss: 0.5289
+2023-07-23 09:55:02,919 - mmhuman3d - INFO - Epoch [8][2100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 22:02:35, time: 11.974, data_time: 5.615, memory: 6986, keypoints3d_loss: 0.1813, keypoints2d_loss: 0.0587, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2831, loss: 0.5231
+2023-07-23 10:05:29,690 - mmhuman3d - INFO - Epoch [8][2150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 21:52:36, time: 12.536, data_time: 11.908, memory: 6986, keypoints3d_loss: 0.1919, keypoints2d_loss: 0.0620, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2825, loss: 0.5363
+2023-07-23 10:16:04,399 - mmhuman3d - INFO - Epoch [8][2200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 21:47:47, time: 12.694, data_time: 11.481, memory: 6986, keypoints3d_loss: 0.1812, keypoints2d_loss: 0.0574, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2828, loss: 0.5213
+2023-07-23 10:26:09,188 - mmhuman3d - INFO - Epoch [8][2250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 21:23:28, time: 12.096, data_time: 11.473, memory: 6986, keypoints3d_loss: 0.1831, keypoints2d_loss: 0.0612, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2816, loss: 0.5259
+2023-07-23 10:36:15,965 - mmhuman3d - INFO - Epoch [8][2300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 21:00:33, time: 12.136, data_time: 11.506, memory: 6986, keypoints3d_loss: 0.1844, keypoints2d_loss: 0.0568, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2832, loss: 0.5244
+2023-07-23 10:46:11,844 - mmhuman3d - INFO - Epoch [8][2350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 20:30:42, time: 11.917, data_time: 8.850, memory: 6986, keypoints3d_loss: 0.1831, keypoints2d_loss: 0.0592, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2816, loss: 0.5239
+2023-07-23 10:56:08,196 - mmhuman3d - INFO - Epoch [8][2400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 20:01:21, time: 11.927, data_time: 9.846, memory: 6986, keypoints3d_loss: 0.1797, keypoints2d_loss: 0.0580, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2824, loss: 0.5200
+2023-07-23 11:04:06,059 - mmhuman3d - INFO - Saving checkpoint at 8 epochs
+2023-07-23 11:14:23,883 - mmhuman3d - INFO - Epoch [9][50/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 14:25:55, time: 12.332, data_time: 4.130, memory: 6986, keypoints3d_loss: 0.1816, keypoints2d_loss: 0.0565, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2827, loss: 0.5208
+2023-07-23 11:24:12,499 - mmhuman3d - INFO - Epoch [9][100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 13:53:14, time: 11.771, data_time: 1.254, memory: 6986, keypoints3d_loss: 0.1859, keypoints2d_loss: 0.0581, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2824, loss: 0.5264
+2023-07-23 11:34:10,075 - mmhuman3d - INFO - Epoch [9][150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 13:26:25, time: 11.951, data_time: 4.237, memory: 6986, keypoints3d_loss: 0.1928, keypoints2d_loss: 0.0621, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2829, loss: 0.5379
+2023-07-23 11:44:04,390 - mmhuman3d - INFO - Epoch [9][200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 12:57:44, time: 11.887, data_time: 6.900, memory: 6986, keypoints3d_loss: 0.1792, keypoints2d_loss: 0.0570, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2823, loss: 0.5185
+2023-07-23 11:54:23,117 - mmhuman3d - INFO - Epoch [9][250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 12:44:27, time: 12.374, data_time: 10.529, memory: 6986, keypoints3d_loss: 0.1875, keypoints2d_loss: 0.0582, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2824, loss: 0.5280
+2023-07-23 12:04:06,409 - mmhuman3d - INFO - Epoch [9][300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 12:09:03, time: 11.665, data_time: 5.835, memory: 6986, keypoints3d_loss: 0.1839, keypoints2d_loss: 0.0592, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2817, loss: 0.5248
+2023-07-23 12:14:04,617 - mmhuman3d - INFO - Epoch [9][350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 11:43:10, time: 11.964, data_time: 0.489, memory: 6986, keypoints3d_loss: 0.1866, keypoints2d_loss: 0.0611, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2828, loss: 0.5305
+2023-07-23 12:24:01,437 - mmhuman3d - INFO - Epoch [9][400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 11:16:31, time: 11.936, data_time: 1.945, memory: 6986, keypoints3d_loss: 0.1844, keypoints2d_loss: 0.0589, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2825, loss: 0.5258
+2023-07-23 12:34:34,817 - mmhuman3d - INFO - Epoch [9][450/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 11:12:37, time: 12.669, data_time: 0.207, memory: 6986, keypoints3d_loss: 0.1860, keypoints2d_loss: 0.0566, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2832, loss: 0.5257
+2023-07-23 12:45:03,386 - mmhuman3d - INFO - Epoch [9][500/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 11:05:38, time: 12.571, data_time: 0.265, memory: 6986, keypoints3d_loss: 0.1803, keypoints2d_loss: 0.0600, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2819, loss: 0.5222
+2023-07-23 12:54:48,884 - mmhuman3d - INFO - Epoch [9][550/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 10:32:18, time: 11.710, data_time: 3.168, memory: 6986, keypoints3d_loss: 0.1701, keypoints2d_loss: 0.0554, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2820, loss: 0.5075
+2023-07-23 13:05:28,881 - mmhuman3d - INFO - Epoch [9][600/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 10:32:20, time: 12.799, data_time: 0.347, memory: 6986, keypoints3d_loss: 0.1871, keypoints2d_loss: 0.0558, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2836, loss: 0.5266
+2023-07-23 13:15:54,012 - mmhuman3d - INFO - Epoch [9][650/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 10:23:20, time: 12.504, data_time: 0.019, memory: 6986, keypoints3d_loss: 0.1780, keypoints2d_loss: 0.0591, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2816, loss: 0.5187
+2023-07-23 13:26:08,293 - mmhuman3d - INFO - Epoch [9][700/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 10:07:43, time: 12.286, data_time: 1.223, memory: 6986, keypoints3d_loss: 0.1981, keypoints2d_loss: 0.0584, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2836, loss: 0.5402
+2023-07-23 13:36:10,671 - mmhuman3d - INFO - Epoch [9][750/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 9:44:56, time: 12.046, data_time: 2.031, memory: 6986, keypoints3d_loss: 0.1762, keypoints2d_loss: 0.0591, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2821, loss: 0.5174
+2023-07-23 13:46:19,171 - mmhuman3d - INFO - Epoch [9][800/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 9:25:56, time: 12.169, data_time: 0.931, memory: 6986, keypoints3d_loss: 0.1865, keypoints2d_loss: 0.0587, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2829, loss: 0.5280
+2023-07-23 13:56:21,306 - mmhuman3d - INFO - Epoch [9][850/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 9:03:18, time: 12.045, data_time: 0.020, memory: 6986, keypoints3d_loss: 0.1848, keypoints2d_loss: 0.0597, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2828, loss: 0.5274
+2023-07-23 14:06:19,037 - mmhuman3d - INFO - Epoch [9][900/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 8:38:03, time: 11.954, data_time: 0.270, memory: 6986, keypoints3d_loss: 0.1731, keypoints2d_loss: 0.0574, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2832, loss: 0.5136
+2023-07-23 14:16:36,110 - mmhuman3d - INFO - Epoch [9][950/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 8:24:26, time: 12.342, data_time: 0.467, memory: 6986, keypoints3d_loss: 0.1781, keypoints2d_loss: 0.0563, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2822, loss: 0.5166
+2023-07-23 14:26:41,608 - mmhuman3d - INFO - Epoch [9][1000/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 8:03:58, time: 12.110, data_time: 5.235, memory: 6986, keypoints3d_loss: 0.1827, keypoints2d_loss: 0.0587, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2825, loss: 0.5239
+2023-07-23 14:36:41,760 - mmhuman3d - INFO - Epoch [9][1050/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 7:40:26, time: 12.002, data_time: 3.280, memory: 6986, keypoints3d_loss: 0.1802, keypoints2d_loss: 0.0564, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2830, loss: 0.5196
+2023-07-23 14:47:09,413 - mmhuman3d - INFO - Epoch [9][1100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 7:33:08, time: 12.554, data_time: 0.018, memory: 6986, keypoints3d_loss: 0.1724, keypoints2d_loss: 0.0585, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2824, loss: 0.5133
+2023-07-23 14:57:28,781 - mmhuman3d - INFO - Epoch [9][1150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 7:20:58, time: 12.387, data_time: 0.327, memory: 6986, keypoints3d_loss: 0.1891, keypoints2d_loss: 0.0624, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2817, loss: 0.5332
+2023-07-23 15:07:19,957 - mmhuman3d - INFO - Epoch [9][1200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 6:52:24, time: 11.823, data_time: 2.872, memory: 6986, keypoints3d_loss: 0.1814, keypoints2d_loss: 0.0582, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2834, loss: 0.5231
+2023-07-23 15:17:15,361 - mmhuman3d - INFO - Epoch [9][1250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 6:26:28, time: 11.909, data_time: 7.250, memory: 6986, keypoints3d_loss: 0.1738, keypoints2d_loss: 0.0586, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2836, loss: 0.5160
+2023-07-23 15:27:22,168 - mmhuman3d - INFO - Epoch [9][1300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 6:07:12, time: 12.136, data_time: 11.503, memory: 6986, keypoints3d_loss: 0.1957, keypoints2d_loss: 0.0604, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2826, loss: 0.5388
+2023-07-23 15:37:33,026 - mmhuman3d - INFO - Epoch [9][1350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 5:50:21, time: 12.217, data_time: 11.586, memory: 6986, keypoints3d_loss: 0.1799, keypoints2d_loss: 0.0566, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2831, loss: 0.5195
+2023-07-23 15:47:17,619 - mmhuman3d - INFO - Epoch [9][1400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 5:18:30, time: 11.692, data_time: 10.030, memory: 6986, keypoints3d_loss: 0.1753, keypoints2d_loss: 0.0556, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2822, loss: 0.5131
+2023-07-23 15:57:34,655 - mmhuman3d - INFO - Epoch [9][1450/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 5:05:19, time: 12.341, data_time: 7.519, memory: 6986, keypoints3d_loss: 0.1755, keypoints2d_loss: 0.0572, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2827, loss: 0.5154
+2023-07-23 16:07:31,355 - mmhuman3d - INFO - Epoch [9][1500/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 4:40:34, time: 11.933, data_time: 2.296, memory: 6986, keypoints3d_loss: 0.1788, keypoints2d_loss: 0.0553, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2832, loss: 0.5174
+2023-07-23 16:17:26,763 - mmhuman3d - INFO - Epoch [9][1550/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 4:15:15, time: 11.909, data_time: 0.893, memory: 6986, keypoints3d_loss: 0.1698, keypoints2d_loss: 0.0576, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2834, loss: 0.5108
+2023-07-23 16:27:16,917 - mmhuman3d - INFO - Epoch [9][1600/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 3:47:01, time: 11.801, data_time: 6.706, memory: 6986, keypoints3d_loss: 0.1679, keypoints2d_loss: 0.0568, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2826, loss: 0.5073
+2023-07-23 16:37:45,996 - mmhuman3d - INFO - Epoch [9][1650/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 3:40:52, time: 12.583, data_time: 5.374, memory: 6986, keypoints3d_loss: 0.1771, keypoints2d_loss: 0.0591, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2836, loss: 0.5198
+2023-07-23 16:47:30,575 - mmhuman3d - INFO - Epoch [9][1700/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 3:09:44, time: 11.692, data_time: 0.094, memory: 6986, keypoints3d_loss: 0.1731, keypoints2d_loss: 0.0543, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2822, loss: 0.5097
+2023-07-23 16:57:46,061 - mmhuman3d - INFO - Epoch [9][1750/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 2:55:59, time: 12.309, data_time: 7.896, memory: 6986, keypoints3d_loss: 0.1841, keypoints2d_loss: 0.0560, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2829, loss: 0.5229
+2023-07-23 17:07:42,857 - mmhuman3d - INFO - Epoch [9][1800/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 2:31:54, time: 11.936, data_time: 11.295, memory: 6986, keypoints3d_loss: 0.1717, keypoints2d_loss: 0.0546, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2829, loss: 0.5092
+2023-07-23 17:18:01,053 - mmhuman3d - INFO - Epoch [9][1850/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 2:19:45, time: 12.364, data_time: 9.895, memory: 6986, keypoints3d_loss: 0.1766, keypoints2d_loss: 0.0555, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2834, loss: 0.5155
+2023-07-23 17:27:48,360 - mmhuman3d - INFO - Epoch [9][1900/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 1:50:33, time: 11.746, data_time: 8.346, memory: 6986, keypoints3d_loss: 0.1725, keypoints2d_loss: 0.0573, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2832, loss: 0.5130
+2023-07-23 17:38:02,761 - mmhuman3d - INFO - Epoch [9][1950/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 1:36:25, time: 12.288, data_time: 11.635, memory: 6986, keypoints3d_loss: 0.1808, keypoints2d_loss: 0.0579, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2834, loss: 0.5221
+2023-07-23 17:47:51,417 - mmhuman3d - INFO - Epoch [9][2000/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 1:08:11, time: 11.773, data_time: 4.907, memory: 6986, keypoints3d_loss: 0.2221, keypoints2d_loss: 0.0729, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2840, loss: 0.5790
+2023-07-23 17:57:51,169 - mmhuman3d - INFO - Epoch [9][2050/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 0:46:09, time: 11.996, data_time: 6.235, memory: 6986, keypoints3d_loss: 0.2085, keypoints2d_loss: 0.0674, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2835, loss: 0.5594
+2023-07-23 18:08:00,542 - mmhuman3d - INFO - Epoch [9][2100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 0:29:26, time: 12.187, data_time: 0.020, memory: 6986, keypoints3d_loss: 0.1847, keypoints2d_loss: 0.0602, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2824, loss: 0.5273
+2023-07-23 18:18:06,669 - mmhuman3d - INFO - Epoch [9][2150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 0:11:00, time: 12.123, data_time: 9.641, memory: 6986, keypoints3d_loss: 0.1823, keypoints2d_loss: 0.0593, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2836, loss: 0.5252
+2023-07-23 18:28:26,574 - mmhuman3d - INFO - Epoch [9][2200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 67 days, 0:00:02, time: 12.397, data_time: 11.728, memory: 6986, keypoints3d_loss: 0.1689, keypoints2d_loss: 0.0568, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2821, loss: 0.5077
+2023-07-23 18:38:44,833 - mmhuman3d - INFO - Epoch [9][2250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 23:48:11, time: 12.364, data_time: 11.727, memory: 6986, keypoints3d_loss: 0.1773, keypoints2d_loss: 0.0577, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2835, loss: 0.5185
+2023-07-23 18:48:20,328 - mmhuman3d - INFO - Epoch [9][2300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 23:13:30, time: 11.511, data_time: 7.405, memory: 6986, keypoints3d_loss: 0.1789, keypoints2d_loss: 0.0573, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2828, loss: 0.5190
+2023-07-23 18:58:35,222 - mmhuman3d - INFO - Epoch [9][2350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 22:59:57, time: 12.297, data_time: 11.131, memory: 6986, keypoints3d_loss: 0.1753, keypoints2d_loss: 0.0580, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2832, loss: 0.5165
+2023-07-23 19:08:39,813 - mmhuman3d - INFO - Epoch [9][2400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 22:41:01, time: 12.093, data_time: 7.499, memory: 6986, keypoints3d_loss: 0.1683, keypoints2d_loss: 0.0568, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2841, loss: 0.5092
+2023-07-23 19:16:32,614 - mmhuman3d - INFO - Saving checkpoint at 9 epochs
+2023-07-23 19:27:02,277 - mmhuman3d - INFO - Epoch [10][50/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 18:10:46, time: 12.573, data_time: 3.562, memory: 6986, keypoints3d_loss: 0.1752, keypoints2d_loss: 0.0565, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2835, loss: 0.5152
+2023-07-23 19:36:49,304 - mmhuman3d - INFO - Epoch [10][100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 17:43:32, time: 11.740, data_time: 5.549, memory: 6986, keypoints3d_loss: 0.1660, keypoints2d_loss: 0.0540, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2836, loss: 0.5035
+2023-07-23 19:46:47,945 - mmhuman3d - INFO - Epoch [10][150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 17:22:31, time: 11.973, data_time: 7.938, memory: 6986, keypoints3d_loss: 0.1664, keypoints2d_loss: 0.0565, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2835, loss: 0.5064
+2023-07-23 19:56:46,796 - mmhuman3d - INFO - Epoch [10][200/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 17:01:39, time: 11.976, data_time: 5.074, memory: 6986, keypoints3d_loss: 0.1763, keypoints2d_loss: 0.0565, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2832, loss: 0.5160
+2023-07-23 20:06:49,069 - mmhuman3d - INFO - Epoch [10][250/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 16:42:42, time: 12.047, data_time: 2.991, memory: 6986, keypoints3d_loss: 0.1763, keypoints2d_loss: 0.0564, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2840, loss: 0.5167
+2023-07-23 20:16:45,238 - mmhuman3d - INFO - Epoch [10][300/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 16:20:35, time: 11.922, data_time: 7.709, memory: 6986, keypoints3d_loss: 0.1705, keypoints2d_loss: 0.0575, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2831, loss: 0.5111
+2023-07-23 20:27:04,602 - mmhuman3d - INFO - Epoch [10][350/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 16:10:35, time: 12.387, data_time: 11.739, memory: 6986, keypoints3d_loss: 0.1748, keypoints2d_loss: 0.0560, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2835, loss: 0.5143
+2023-07-23 20:37:05,734 - mmhuman3d - INFO - Epoch [10][400/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 15:51:09, time: 12.022, data_time: 11.364, memory: 6986, keypoints3d_loss: 0.1715, keypoints2d_loss: 0.0548, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2821, loss: 0.5085
+2023-07-23 20:47:35,426 - mmhuman3d - INFO - Epoch [10][450/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 15:46:29, time: 12.594, data_time: 2.398, memory: 6986, keypoints3d_loss: 0.1796, keypoints2d_loss: 0.0570, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2829, loss: 0.5195
+2023-07-23 20:57:24,411 - mmhuman3d - INFO - Epoch [10][500/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 15:20:59, time: 11.781, data_time: 2.140, memory: 6986, keypoints3d_loss: 0.1662, keypoints2d_loss: 0.0548, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2832, loss: 0.5043
+2023-07-23 21:07:10,984 - mmhuman3d - INFO - Epoch [10][550/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 14:54:17, time: 11.732, data_time: 9.969, memory: 6986, keypoints3d_loss: 0.1644, keypoints2d_loss: 0.0529, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2833, loss: 0.5006
+2023-07-23 21:17:01,026 - mmhuman3d - INFO - Epoch [10][600/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 14:29:29, time: 11.801, data_time: 4.968, memory: 6986, keypoints3d_loss: 0.1651, keypoints2d_loss: 0.0546, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2830, loss: 0.5027
+2023-07-23 21:26:59,583 - mmhuman3d - INFO - Epoch [10][650/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 14:09:05, time: 11.971, data_time: 11.336, memory: 6986, keypoints3d_loss: 0.1663, keypoints2d_loss: 0.0561, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2838, loss: 0.5063
+2023-07-23 21:37:14,101 - mmhuman3d - INFO - Epoch [10][700/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 13:56:50, time: 12.290, data_time: 2.653, memory: 6986, keypoints3d_loss: 0.1668, keypoints2d_loss: 0.0563, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2841, loss: 0.5072
+2023-07-23 21:47:10,168 - mmhuman3d - INFO - Epoch [10][750/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 13:35:18, time: 11.921, data_time: 0.789, memory: 6986, keypoints3d_loss: 0.1745, keypoints2d_loss: 0.0583, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2834, loss: 0.5162
+2023-07-23 21:57:34,801 - mmhuman3d - INFO - Epoch [10][800/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 13:28:09, time: 12.492, data_time: 2.576, memory: 6986, keypoints3d_loss: 0.1649, keypoints2d_loss: 0.0545, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2838, loss: 0.5032
+2023-07-23 22:08:28,344 - mmhuman3d - INFO - Epoch [10][850/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 13:35:30, time: 13.071, data_time: 4.352, memory: 6986, keypoints3d_loss: 0.1780, keypoints2d_loss: 0.0573, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2827, loss: 0.5180
+2023-07-23 22:19:37,360 - mmhuman3d - INFO - Epoch [10][900/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 13:50:24, time: 13.380, data_time: 0.835, memory: 6986, keypoints3d_loss: 0.1672, keypoints2d_loss: 0.0549, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2831, loss: 0.5052
+2023-07-23 22:30:08,280 - mmhuman3d - INFO - Epoch [10][950/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 13:46:15, time: 12.619, data_time: 8.090, memory: 6986, keypoints3d_loss: 0.1633, keypoints2d_loss: 0.0567, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2839, loss: 0.5039
+2023-07-23 22:41:40,492 - mmhuman3d - INFO - Epoch [10][1000/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 14:12:24, time: 13.844, data_time: 13.221, memory: 6986, keypoints3d_loss: 0.1747, keypoints2d_loss: 0.0567, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2828, loss: 0.5143
+2023-07-23 22:52:38,894 - mmhuman3d - INFO - Epoch [10][1050/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 14:21:37, time: 13.168, data_time: 12.451, memory: 6986, keypoints3d_loss: 0.1823, keypoints2d_loss: 0.0587, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2833, loss: 0.5244
+2023-07-23 23:03:57,065 - mmhuman3d - INFO - Epoch [10][1100/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 14:40:26, time: 13.563, data_time: 3.387, memory: 6986, keypoints3d_loss: 0.1666, keypoints2d_loss: 0.0549, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2832, loss: 0.5047
+2023-07-23 23:15:19,115 - mmhuman3d - INFO - Epoch [10][1150/2439]	lr_backbone: 1.000e-04 lr_head: 1.000e-04 lr_disc: 1.000e-04, eta: 66 days, 15:00:57, time: 13.641, data_time: 0.643, memory: 6986, keypoints3d_loss: 0.1776, keypoints2d_loss: 0.0559, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, adv_loss: 0.2827, loss: 0.5161
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+Killing subprocess 20357
+Killing subprocess 20358
+Killing subprocess 20359
+Killing subprocess 20360
+Main process received SIGTERM, exiting
+__temporal_len__ is absent in HumanData.SUPPORTED_KEYS.
+Ignore this if you know exactly what you are doing.
+Otherwise, Call self.set_key_strict(True) to avoid wrong keys.
+
+cam_param is absent in HumanData.SUPPORTED_KEYS.
+Ignore this if you know exactly what you are doing.
+Otherwise, Call self.set_key_strict(True) to avoid wrong keys.
+
+/root/anaconda3/envs/mmhuman/lib/python3.8/multiprocessing/resource_tracker.py:216: UserWarning: resource_tracker: There appear to be 11 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+__temporal_len__ is absent in HumanData.SUPPORTED_KEYS.
+Ignore this if you know exactly what you are doing.
+Otherwise, Call self.set_key_strict(True) to avoid wrong keys.
+
+cam_param is absent in HumanData.SUPPORTED_KEYS.
+Ignore this if you know exactly what you are doing.
+Otherwise, Call self.set_key_strict(True) to avoid wrong keys.
+
+__temporal_len__ is absent in HumanData.SUPPORTED_KEYS.
+Ignore this if you know exactly what you are doing.
+Otherwise, Call self.set_key_strict(True) to avoid wrong keys.
+
+cam_param is absent in HumanData.SUPPORTED_KEYS.
+Ignore this if you know exactly what you are doing.
+Otherwise, Call self.set_key_strict(True) to avoid wrong keys.
+
+/root/anaconda3/envs/mmhuman/lib/python3.8/multiprocessing/resource_tracker.py:216: UserWarning: resource_tracker: There appear to be 11 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+/root/anaconda3/envs/mmhuman/lib/python3.8/multiprocessing/resource_tracker.py:216: UserWarning: resource_tracker: There appear to be 11 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+__temporal_len__ is absent in HumanData.SUPPORTED_KEYS.
+Ignore this if you know exactly what you are doing.
+Otherwise, Call self.set_key_strict(True) to avoid wrong keys.
+
+cam_param is absent in HumanData.SUPPORTED_KEYS.
+Ignore this if you know exactly what you are doing.
+Otherwise, Call self.set_key_strict(True) to avoid wrong keys.
+
+/root/anaconda3/envs/mmhuman/lib/python3.8/multiprocessing/resource_tracker.py:216: UserWarning: resource_tracker: There appear to be 11 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '

@@ -1,0 +1,744 @@
+nohup: ignoring input
+2023-02-27 20:58:00,742 - mmhuman3d - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.16 (default, Jan 17 2023, 23:13:24) [GCC 11.2.0]
+CUDA available: True
+GPU 0,1,2,3: NVIDIA TITAN RTX
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 11.0, V11.0.221
+GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+PyTorch: 1.8.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2021.4-Product Build 20210904 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.7.0 (Git Hash 7aed236906b1f7a05c0917e5257a1af05e9ff683)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 10.2
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_37,code=compute_37
+  - CuDNN 7.6.5
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=10.2, CUDNN_VERSION=7.6.5, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.8.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+TorchVision: 0.9.0
+OpenCV: 4.7.0
+MMCV: 1.5.3
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 10.2
+MMHuman3d: 0.10.0+8ece4bc
+------------------------------------------------------------
+
+2023-02-27 20:58:00,743 - mmhuman3d - INFO - Distributed training: True
+2023-02-27 20:58:01,848 - mmhuman3d - INFO - Config:
+checkpoint_config = dict(interval=1)
+log_config = dict(
+    interval=50,
+    hooks=[dict(type='TextLoggerHook'),
+           dict(type='TensorboardLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+use_adversarial_train = True
+img_res = 224
+optimizer = dict(
+    backbone=dict(type='Adam', lr=0.0002),
+    head=dict(type='Adam', lr=0.0002),
+    disc=dict(type='Adam', lr=0.0001))
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(policy='Fixed', by_epoch=False)
+runner = dict(type='EpochBasedRunner', max_epochs=200)
+hrnet_extra = dict(
+    stage1=dict(
+        num_modules=1,
+        num_branches=1,
+        block='BOTTLENECK',
+        num_blocks=(4, ),
+        num_channels=(64, )),
+    stage2=dict(
+        num_modules=1,
+        num_branches=2,
+        block='BASIC',
+        num_blocks=(4, 4),
+        num_channels=(32, 64)),
+    stage3=dict(
+        num_modules=4,
+        num_branches=3,
+        block='BASIC',
+        num_blocks=(4, 4, 4),
+        num_channels=(32, 64, 128)),
+    stage4=dict(
+        num_modules=3,
+        num_branches=4,
+        block='BASIC',
+        num_blocks=(4, 4, 4, 4),
+        num_channels=(32, 64, 128, 256)),
+    return_list=False,
+    multi_tasks=True,
+    downsample=False,
+    use_conv=False,
+    final_conv_kernel=1,
+    pretrained_layers=[
+        'conv1', 'bn1', 'conv2', 'bn2', 'layer1', 'transition1', 'stage2',
+        'transition2', 'stage3', 'transition3', 'stage4'
+    ])
+find_unused_parameters = True
+model = dict(
+    type='ImageBodyModelEstimator',
+    backbone=dict(
+        type='PoseHighResolutionNet',
+        extra=dict(
+            stage1=dict(
+                num_modules=1,
+                num_branches=1,
+                block='BOTTLENECK',
+                num_blocks=(4, ),
+                num_channels=(64, )),
+            stage2=dict(
+                num_modules=1,
+                num_branches=2,
+                block='BASIC',
+                num_blocks=(4, 4),
+                num_channels=(32, 64)),
+            stage3=dict(
+                num_modules=4,
+                num_branches=3,
+                block='BASIC',
+                num_blocks=(4, 4, 4),
+                num_channels=(32, 64, 128)),
+            stage4=dict(
+                num_modules=3,
+                num_branches=4,
+                block='BASIC',
+                num_blocks=(4, 4, 4, 4),
+                num_channels=(32, 64, 128, 256)),
+            return_list=False,
+            multi_tasks=True,
+            downsample=False,
+            use_conv=False,
+            final_conv_kernel=1,
+            pretrained_layers=[
+                'conv1', 'bn1', 'conv2', 'bn2', 'layer1', 'transition1',
+                'stage2', 'transition2', 'stage3', 'transition3', 'stage4'
+            ]),
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint='data/pretrained_models/hrnet_pretrain.pth')),
+    head=dict(
+        type='HMRHead',
+        feat_dim=2048,
+        smpl_mean_params='data/body_models/smpl_mean_params.npz'),
+    body_model_train=dict(
+        type='SMPL',
+        keypoint_src='smpl_54',
+        keypoint_dst='smpl_54',
+        model_path='data/body_models/smpl',
+        keypoint_approximate=True,
+        extra_joints_regressor='data/body_models/J_regressor_extra.npy'),
+    body_model_test=dict(
+        type='SMPL',
+        keypoint_src='h36m',
+        keypoint_dst='h36m',
+        model_path='data/body_models/smpl',
+        joints_regressor='data/body_models/J_regressor_h36m.npy'),
+    convention='smpl_54',
+    loss_keypoints3d=dict(type='SmoothL1Loss', loss_weight=100),
+    loss_keypoints2d=dict(type='SmoothL1Loss', loss_weight=10),
+    loss_vertex=dict(type='L1Loss', loss_weight=2),
+    loss_smpl_pose=dict(type='MSELoss', loss_weight=3),
+    loss_smpl_betas=dict(type='MSELoss', loss_weight=0.02),
+    loss_adv=dict(
+        type='GANLoss',
+        gan_type='lsgan',
+        real_label_val=1.0,
+        fake_label_val=0.0,
+        loss_weight=1),
+    disc=dict(type='SMPLDiscriminator'),
+    loss_heatmap2d=dict(type='HeatmapMSELoss', loss_weight=300))
+dataset_type = 'HumanImageDataset'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+data_keys = [
+    'has_smpl', 'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+    'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+]
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='RandomChannelNoise', noise_factor=0.4),
+    dict(type='RandomHorizontalFlip', flip_prob=0.5, convention='smpl_54'),
+    dict(type='GetRandomScaleRotation', rot_factor=30, scale_factor=0.25),
+    dict(type='MeshAffine', img_res=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(
+        type='ToTensor',
+        keys=[
+            'has_smpl', 'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+            'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+        ]),
+    dict(
+        type='Collect',
+        keys=[
+            'img', 'has_smpl', 'smpl_body_pose', 'smpl_global_orient',
+            'smpl_betas', 'smpl_transl', 'keypoints2d', 'keypoints3d',
+            'sample_idx'
+        ],
+        meta_keys=['image_path', 'center', 'scale', 'rotation'])
+]
+adv_data_keys = [
+    'smpl_body_pose', 'smpl_global_orient', 'smpl_betas', 'smpl_transl'
+]
+train_adv_pipeline = [
+    dict(
+        type='Collect',
+        keys=[
+            'smpl_body_pose', 'smpl_global_orient', 'smpl_betas', 'smpl_transl'
+        ],
+        meta_keys=[])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='GetRandomScaleRotation', rot_factor=0, scale_factor=0),
+    dict(type='MeshAffine', img_res=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(
+        type='ToTensor',
+        keys=[
+            'has_smpl', 'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+            'smpl_transl', 'keypoints2d', 'keypoints3d', 'sample_idx'
+        ]),
+    dict(
+        type='Collect',
+        keys=[
+            'img', 'has_smpl', 'smpl_body_pose', 'smpl_global_orient',
+            'smpl_betas', 'smpl_transl', 'keypoints2d', 'keypoints3d',
+            'sample_idx'
+        ],
+        meta_keys=['image_path', 'center', 'scale', 'rotation'])
+]
+inference_pipeline = [
+    dict(type='MeshAffine', img_res=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(
+        type='Collect',
+        keys=['img', 'sample_idx'],
+        meta_keys=['image_path', 'center', 'scale', 'rotation'])
+]
+data = dict(
+    samples_per_gpu=32,
+    workers_per_gpu=1,
+    train=dict(
+        type='AdversarialDataset',
+        train_dataset=dict(
+            type='MixedDataset',
+            configs=[
+                dict(
+                    type='HumanImageDataset',
+                    dataset_name='h36m',
+                    data_prefix='data',
+                    pipeline=[
+                        dict(type='LoadImageFromFile'),
+                        dict(type='RandomChannelNoise', noise_factor=0.4),
+                        dict(
+                            type='RandomHorizontalFlip',
+                            flip_prob=0.5,
+                            convention='smpl_54'),
+                        dict(
+                            type='GetRandomScaleRotation',
+                            rot_factor=30,
+                            scale_factor=0.25),
+                        dict(type='MeshAffine', img_res=224),
+                        dict(
+                            type='Normalize',
+                            mean=[123.675, 116.28, 103.53],
+                            std=[58.395, 57.12, 57.375],
+                            to_rgb=True),
+                        dict(type='ImageToTensor', keys=['img']),
+                        dict(
+                            type='ToTensor',
+                            keys=[
+                                'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ]),
+                        dict(
+                            type='Collect',
+                            keys=[
+                                'img', 'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ],
+                            meta_keys=[
+                                'image_path', 'center', 'scale', 'rotation'
+                            ])
+                    ],
+                    convention='smpl_54',
+                    ann_file='h36m_train.npz'),
+                dict(
+                    type='HumanImageDataset',
+                    dataset_name='mpi_inf_3dhp',
+                    data_prefix='data',
+                    pipeline=[
+                        dict(type='LoadImageFromFile'),
+                        dict(type='RandomChannelNoise', noise_factor=0.4),
+                        dict(
+                            type='RandomHorizontalFlip',
+                            flip_prob=0.5,
+                            convention='smpl_54'),
+                        dict(
+                            type='GetRandomScaleRotation',
+                            rot_factor=30,
+                            scale_factor=0.25),
+                        dict(type='MeshAffine', img_res=224),
+                        dict(
+                            type='Normalize',
+                            mean=[123.675, 116.28, 103.53],
+                            std=[58.395, 57.12, 57.375],
+                            to_rgb=True),
+                        dict(type='ImageToTensor', keys=['img']),
+                        dict(
+                            type='ToTensor',
+                            keys=[
+                                'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ]),
+                        dict(
+                            type='Collect',
+                            keys=[
+                                'img', 'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ],
+                            meta_keys=[
+                                'image_path', 'center', 'scale', 'rotation'
+                            ])
+                    ],
+                    convention='smpl_54',
+                    ann_file='mpi_inf_3dhp_train.npz'),
+                dict(
+                    type='HumanImageDataset',
+                    dataset_name='lsp',
+                    data_prefix='data',
+                    pipeline=[
+                        dict(type='LoadImageFromFile'),
+                        dict(type='RandomChannelNoise', noise_factor=0.4),
+                        dict(
+                            type='RandomHorizontalFlip',
+                            flip_prob=0.5,
+                            convention='smpl_54'),
+                        dict(
+                            type='GetRandomScaleRotation',
+                            rot_factor=30,
+                            scale_factor=0.25),
+                        dict(type='MeshAffine', img_res=224),
+                        dict(
+                            type='Normalize',
+                            mean=[123.675, 116.28, 103.53],
+                            std=[58.395, 57.12, 57.375],
+                            to_rgb=True),
+                        dict(type='ImageToTensor', keys=['img']),
+                        dict(
+                            type='ToTensor',
+                            keys=[
+                                'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ]),
+                        dict(
+                            type='Collect',
+                            keys=[
+                                'img', 'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ],
+                            meta_keys=[
+                                'image_path', 'center', 'scale', 'rotation'
+                            ])
+                    ],
+                    convention='smpl_54',
+                    ann_file='lsp_train.npz'),
+                dict(
+                    type='HumanImageDataset',
+                    dataset_name='lspet',
+                    data_prefix='data',
+                    pipeline=[
+                        dict(type='LoadImageFromFile'),
+                        dict(type='RandomChannelNoise', noise_factor=0.4),
+                        dict(
+                            type='RandomHorizontalFlip',
+                            flip_prob=0.5,
+                            convention='smpl_54'),
+                        dict(
+                            type='GetRandomScaleRotation',
+                            rot_factor=30,
+                            scale_factor=0.25),
+                        dict(type='MeshAffine', img_res=224),
+                        dict(
+                            type='Normalize',
+                            mean=[123.675, 116.28, 103.53],
+                            std=[58.395, 57.12, 57.375],
+                            to_rgb=True),
+                        dict(type='ImageToTensor', keys=['img']),
+                        dict(
+                            type='ToTensor',
+                            keys=[
+                                'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ]),
+                        dict(
+                            type='Collect',
+                            keys=[
+                                'img', 'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ],
+                            meta_keys=[
+                                'image_path', 'center', 'scale', 'rotation'
+                            ])
+                    ],
+                    convention='smpl_54',
+                    ann_file='lspet_train.npz'),
+                dict(
+                    type='HumanImageDataset',
+                    dataset_name='mpii',
+                    data_prefix='data',
+                    pipeline=[
+                        dict(type='LoadImageFromFile'),
+                        dict(type='RandomChannelNoise', noise_factor=0.4),
+                        dict(
+                            type='RandomHorizontalFlip',
+                            flip_prob=0.5,
+                            convention='smpl_54'),
+                        dict(
+                            type='GetRandomScaleRotation',
+                            rot_factor=30,
+                            scale_factor=0.25),
+                        dict(type='MeshAffine', img_res=224),
+                        dict(
+                            type='Normalize',
+                            mean=[123.675, 116.28, 103.53],
+                            std=[58.395, 57.12, 57.375],
+                            to_rgb=True),
+                        dict(type='ImageToTensor', keys=['img']),
+                        dict(
+                            type='ToTensor',
+                            keys=[
+                                'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ]),
+                        dict(
+                            type='Collect',
+                            keys=[
+                                'img', 'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ],
+                            meta_keys=[
+                                'image_path', 'center', 'scale', 'rotation'
+                            ])
+                    ],
+                    convention='smpl_54',
+                    ann_file='mpii_train.npz'),
+                dict(
+                    type='HumanImageDataset',
+                    dataset_name='coco',
+                    data_prefix='data',
+                    pipeline=[
+                        dict(type='LoadImageFromFile'),
+                        dict(type='RandomChannelNoise', noise_factor=0.4),
+                        dict(
+                            type='RandomHorizontalFlip',
+                            flip_prob=0.5,
+                            convention='smpl_54'),
+                        dict(
+                            type='GetRandomScaleRotation',
+                            rot_factor=30,
+                            scale_factor=0.25),
+                        dict(type='MeshAffine', img_res=224),
+                        dict(
+                            type='Normalize',
+                            mean=[123.675, 116.28, 103.53],
+                            std=[58.395, 57.12, 57.375],
+                            to_rgb=True),
+                        dict(type='ImageToTensor', keys=['img']),
+                        dict(
+                            type='ToTensor',
+                            keys=[
+                                'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ]),
+                        dict(
+                            type='Collect',
+                            keys=[
+                                'img', 'has_smpl', 'smpl_body_pose',
+                                'smpl_global_orient', 'smpl_betas',
+                                'smpl_transl', 'keypoints2d', 'keypoints3d',
+                                'sample_idx'
+                            ],
+                            meta_keys=[
+                                'image_path', 'center', 'scale', 'rotation'
+                            ])
+                    ],
+                    convention='smpl_54',
+                    ann_file='coco_2014_train.npz')
+            ],
+            partition=[0.35, 0.15, 0.1, 0.1, 0.1, 0.2]),
+        adv_dataset=dict(
+            type='MeshDataset',
+            dataset_name='cmu_mosh',
+            data_prefix='data',
+            pipeline=[
+                dict(
+                    type='Collect',
+                    keys=[
+                        'smpl_body_pose', 'smpl_global_orient', 'smpl_betas',
+                        'smpl_transl'
+                    ],
+                    meta_keys=[])
+            ],
+            ann_file='cmu_mosh.npz')),
+    test=dict(
+        type='HumanImageDataset',
+        body_model=dict(
+            type='GenderedSMPL',
+            keypoint_src='h36m',
+            keypoint_dst='h36m',
+            model_path='data/body_models/smpl',
+            joints_regressor='data/body_models/J_regressor_h36m.npy'),
+        dataset_name='pw3d',
+        data_prefix='data',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='GetRandomScaleRotation', rot_factor=0, scale_factor=0),
+            dict(type='MeshAffine', img_res=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(
+                type='ToTensor',
+                keys=[
+                    'has_smpl', 'smpl_body_pose', 'smpl_global_orient',
+                    'smpl_betas', 'smpl_transl', 'keypoints2d', 'keypoints3d',
+                    'sample_idx'
+                ]),
+            dict(
+                type='Collect',
+                keys=[
+                    'img', 'has_smpl', 'smpl_body_pose', 'smpl_global_orient',
+                    'smpl_betas', 'smpl_transl', 'keypoints2d', 'keypoints3d',
+                    'sample_idx'
+                ],
+                meta_keys=['image_path', 'center', 'scale', 'rotation'])
+        ],
+        ann_file='pw3d_test.npz'))
+work_dir = 'workspace/ormr/'
+gpu_ids = range(0, 4)
+
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+2023-02-27 20:58:02,386 - mmhuman3d - INFO - initialize PoseHighResolutionNet with init_cfg {'type': 'Pretrained', 'checkpoint': 'data/pretrained_models/hrnet_pretrain.pth'}
+2023-02-27 20:58:02,387 - mmcv - INFO - load model from: data/pretrained_models/hrnet_pretrain.pth
+2023-02-27 20:58:02,388 - mmcv - INFO - load checkpoint from local path: data/pretrained_models/hrnet_pretrain.pth
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+WARNING: You are using a SMPL model, with only 10 shape coefficients.
+2023-02-27 20:58:16,621 - mmcv - WARNING - The model and loaded state dict do not match exactly
+
+size mismatch for final_layer.weight: copying a param with shape torch.Size([17, 32, 1, 1]) from checkpoint, the shape in current model is torch.Size([54, 32, 1, 1]).
+size mismatch for final_layer.bias: copying a param with shape torch.Size([17]) from checkpoint, the shape in current model is torch.Size([54]).
+missing keys in source state_dict: stage4.2.fuse_layers.1.0.0.0.weight, stage4.2.fuse_layers.1.0.0.1.weight, stage4.2.fuse_layers.1.0.0.1.bias, stage4.2.fuse_layers.1.0.0.1.running_mean, stage4.2.fuse_layers.1.0.0.1.running_var, stage4.2.fuse_layers.1.2.0.weight, stage4.2.fuse_layers.1.2.1.weight, stage4.2.fuse_layers.1.2.1.bias, stage4.2.fuse_layers.1.2.1.running_mean, stage4.2.fuse_layers.1.2.1.running_var, stage4.2.fuse_layers.1.3.0.weight, stage4.2.fuse_layers.1.3.1.weight, stage4.2.fuse_layers.1.3.1.bias, stage4.2.fuse_layers.1.3.1.running_mean, stage4.2.fuse_layers.1.3.1.running_var, stage4.2.fuse_layers.2.0.0.0.weight, stage4.2.fuse_layers.2.0.0.1.weight, stage4.2.fuse_layers.2.0.0.1.bias, stage4.2.fuse_layers.2.0.0.1.running_mean, stage4.2.fuse_layers.2.0.0.1.running_var, stage4.2.fuse_layers.2.0.1.0.weight, stage4.2.fuse_layers.2.0.1.1.weight, stage4.2.fuse_layers.2.0.1.1.bias, stage4.2.fuse_layers.2.0.1.1.running_mean, stage4.2.fuse_layers.2.0.1.1.running_var, stage4.2.fuse_layers.2.1.0.0.weight, stage4.2.fuse_layers.2.1.0.1.weight, stage4.2.fuse_layers.2.1.0.1.bias, stage4.2.fuse_layers.2.1.0.1.running_mean, stage4.2.fuse_layers.2.1.0.1.running_var, stage4.2.fuse_layers.2.3.0.weight, stage4.2.fuse_layers.2.3.1.weight, stage4.2.fuse_layers.2.3.1.bias, stage4.2.fuse_layers.2.3.1.running_mean, stage4.2.fuse_layers.2.3.1.running_var, stage4.2.fuse_layers.3.0.0.0.weight, stage4.2.fuse_layers.3.0.0.1.weight, stage4.2.fuse_layers.3.0.0.1.bias, stage4.2.fuse_layers.3.0.0.1.running_mean, stage4.2.fuse_layers.3.0.0.1.running_var, stage4.2.fuse_layers.3.0.1.0.weight, stage4.2.fuse_layers.3.0.1.1.weight, stage4.2.fuse_layers.3.0.1.1.bias, stage4.2.fuse_layers.3.0.1.1.running_mean, stage4.2.fuse_layers.3.0.1.1.running_var, stage4.2.fuse_layers.3.0.2.0.weight, stage4.2.fuse_layers.3.0.2.1.weight, stage4.2.fuse_layers.3.0.2.1.bias, stage4.2.fuse_layers.3.0.2.1.running_mean, stage4.2.fuse_layers.3.0.2.1.running_var, stage4.2.fuse_layers.3.1.0.0.weight, stage4.2.fuse_layers.3.1.0.1.weight, stage4.2.fuse_layers.3.1.0.1.bias, stage4.2.fuse_layers.3.1.0.1.running_mean, stage4.2.fuse_layers.3.1.0.1.running_var, stage4.2.fuse_layers.3.1.1.0.weight, stage4.2.fuse_layers.3.1.1.1.weight, stage4.2.fuse_layers.3.1.1.1.bias, stage4.2.fuse_layers.3.1.1.1.running_mean, stage4.2.fuse_layers.3.1.1.1.running_var, stage4.2.fuse_layers.3.2.0.0.weight, stage4.2.fuse_layers.3.2.0.1.weight, stage4.2.fuse_layers.3.2.0.1.bias, stage4.2.fuse_layers.3.2.0.1.running_mean, stage4.2.fuse_layers.3.2.0.1.running_var, incre_modules.0.0.conv1.weight, incre_modules.0.0.bn1.weight, incre_modules.0.0.bn1.bias, incre_modules.0.0.bn1.running_mean, incre_modules.0.0.bn1.running_var, incre_modules.0.0.conv2.weight, incre_modules.0.0.bn2.weight, incre_modules.0.0.bn2.bias, incre_modules.0.0.bn2.running_mean, incre_modules.0.0.bn2.running_var, incre_modules.0.0.conv3.weight, incre_modules.0.0.bn3.weight, incre_modules.0.0.bn3.bias, incre_modules.0.0.bn3.running_mean, incre_modules.0.0.bn3.running_var, incre_modules.0.0.downsample.0.weight, incre_modules.0.0.downsample.1.weight, incre_modules.0.0.downsample.1.bias, incre_modules.0.0.downsample.1.running_mean, incre_modules.0.0.downsample.1.running_var, incre_modules.1.0.conv1.weight, incre_modules.1.0.bn1.weight, incre_modules.1.0.bn1.bias, incre_modules.1.0.bn1.running_mean, incre_modules.1.0.bn1.running_var, incre_modules.1.0.conv2.weight, incre_modules.1.0.bn2.weight, incre_modules.1.0.bn2.bias, incre_modules.1.0.bn2.running_mean, incre_modules.1.0.bn2.running_var, incre_modules.1.0.conv3.weight, incre_modules.1.0.bn3.weight, incre_modules.1.0.bn3.bias, incre_modules.1.0.bn3.running_mean, incre_modules.1.0.bn3.running_var, incre_modules.1.0.downsample.0.weight, incre_modules.1.0.downsample.1.weight, incre_modules.1.0.downsample.1.bias, incre_modules.1.0.downsample.1.running_mean, incre_modules.1.0.downsample.1.running_var, incre_modules.2.0.conv1.weight, incre_modules.2.0.bn1.weight, incre_modules.2.0.bn1.bias, incre_modules.2.0.bn1.running_mean, incre_modules.2.0.bn1.running_var, incre_modules.2.0.conv2.weight, incre_modules.2.0.bn2.weight, incre_modules.2.0.bn2.bias, incre_modules.2.0.bn2.running_mean, incre_modules.2.0.bn2.running_var, incre_modules.2.0.conv3.weight, incre_modules.2.0.bn3.weight, incre_modules.2.0.bn3.bias, incre_modules.2.0.bn3.running_mean, incre_modules.2.0.bn3.running_var, incre_modules.2.0.downsample.0.weight, incre_modules.2.0.downsample.1.weight, incre_modules.2.0.downsample.1.bias, incre_modules.2.0.downsample.1.running_mean, incre_modules.2.0.downsample.1.running_var, incre_modules.3.0.conv1.weight, incre_modules.3.0.bn1.weight, incre_modules.3.0.bn1.bias, incre_modules.3.0.bn1.running_mean, incre_modules.3.0.bn1.running_var, incre_modules.3.0.conv2.weight, incre_modules.3.0.bn2.weight, incre_modules.3.0.bn2.bias, incre_modules.3.0.bn2.running_mean, incre_modules.3.0.bn2.running_var, incre_modules.3.0.conv3.weight, incre_modules.3.0.bn3.weight, incre_modules.3.0.bn3.bias, incre_modules.3.0.bn3.running_mean, incre_modules.3.0.bn3.running_var, incre_modules.3.0.downsample.0.weight, incre_modules.3.0.downsample.1.weight, incre_modules.3.0.downsample.1.bias, incre_modules.3.0.downsample.1.running_mean, incre_modules.3.0.downsample.1.running_var, downsamp_modules.0.0.weight, downsamp_modules.0.0.bias, downsamp_modules.0.1.weight, downsamp_modules.0.1.bias, downsamp_modules.0.1.running_mean, downsamp_modules.0.1.running_var, downsamp_modules.1.0.weight, downsamp_modules.1.0.bias, downsamp_modules.1.1.weight, downsamp_modules.1.1.bias, downsamp_modules.1.1.running_mean, downsamp_modules.1.1.running_var, downsamp_modules.2.0.weight, downsamp_modules.2.0.bias, downsamp_modules.2.1.weight, downsamp_modules.2.1.bias, downsamp_modules.2.1.running_mean, downsamp_modules.2.1.running_var, neck_layer.0.weight, neck_layer.0.bias, neck_layer.1.weight, neck_layer.1.bias, neck_layer.1.running_mean, neck_layer.1.running_var
+
+2023-02-27 20:58:47,225 - mmhuman3d - INFO - Start running, host: root@518b9ea961fb, work_dir: /workspaces/mmhuman3d/workspace/ormr
+2023-02-27 20:58:47,226 - mmhuman3d - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) FixedLrUpdaterHook                 
+(NORMAL      ) CheckpointHook                     
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) FixedLrUpdaterHook                 
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) FixedLrUpdaterHook                 
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+2023-02-27 20:58:47,226 - mmhuman3d - INFO - workflow: [('train', 1)], max: 200 epochs
+2023-02-27 20:58:47,226 - mmhuman3d - INFO - Checkpoints will be saved to /workspaces/mmhuman3d/workspace/ormr by HardDiskBackend.
+[W reducer.cpp:1050] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters. This flag results in an extra traversal of the autograd graph every iteration, which can adversely affect performance. If your model indeed never has any unused parameters, consider turning this flag off. Note that this warning may be a false positive your model has flow control causing later iterations to have unused parameters. (function operator())
+[W reducer.cpp:1050] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters. This flag results in an extra traversal of the autograd graph every iteration, which can adversely affect performance. If your model indeed never has any unused parameters, consider turning this flag off. Note that this warning may be a false positive your model has flow control causing later iterations to have unused parameters. (function operator())
+[W reducer.cpp:1050] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters. This flag results in an extra traversal of the autograd graph every iteration, which can adversely affect performance. If your model indeed never has any unused parameters, consider turning this flag off. Note that this warning may be a false positive your model has flow control causing later iterations to have unused parameters. (function operator())
+[W reducer.cpp:1050] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters. This flag results in an extra traversal of the autograd graph every iteration, which can adversely affect performance. If your model indeed never has any unused parameters, consider turning this flag off. Note that this warning may be a false positive your model has flow control causing later iterations to have unused parameters. (function operator())
+2023-02-27 21:10:31,166 - mmhuman3d - INFO - Epoch [1][50/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 79 days, 11:20:20, time: 14.078, data_time: 3.344, memory: 6989, keypoints3d_loss: 2.1975, keypoints2d_loss: 0.5183, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.4962, adv_loss: 0.9751, loss: 4.1871
+2023-02-27 21:22:19,872 - mmhuman3d - INFO - Epoch [1][100/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 79 days, 17:40:18, time: 14.174, data_time: 13.509, memory: 6989, keypoints3d_loss: 1.7784, keypoints2d_loss: 0.4381, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.2370, adv_loss: 0.8776, loss: 3.3312
+2023-02-27 21:33:14,433 - mmhuman3d - INFO - Epoch [1][150/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 77 days, 18:44:48, time: 13.091, data_time: 12.469, memory: 6989, keypoints3d_loss: 1.4120, keypoints2d_loss: 0.3387, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1923, adv_loss: 0.6996, loss: 2.6426
+2023-02-27 21:44:09,011 - mmhuman3d - INFO - Epoch [1][200/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 19:10:32, time: 13.091, data_time: 12.458, memory: 6989, keypoints3d_loss: 1.2685, keypoints2d_loss: 0.2875, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1798, adv_loss: 0.4880, loss: 2.2238
+2023-02-27 21:55:27,816 - mmhuman3d - INFO - Epoch [1][250/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 18:06:38, time: 13.576, data_time: 7.970, memory: 6989, keypoints3d_loss: 1.1919, keypoints2d_loss: 0.2728, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1772, adv_loss: 0.3254, loss: 1.9673
+2023-02-27 22:06:33,708 - mmhuman3d - INFO - Epoch [1][300/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 11:30:45, time: 13.318, data_time: 2.130, memory: 6989, keypoints3d_loss: 1.1390, keypoints2d_loss: 0.2819, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1723, adv_loss: 0.2801, loss: 1.8733
+2023-02-27 22:17:54,664 - mmhuman3d - INFO - Epoch [1][350/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 12:35:44, time: 13.620, data_time: 8.342, memory: 6989, keypoints3d_loss: 1.0020, keypoints2d_loss: 0.2725, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1706, adv_loss: 0.2750, loss: 1.7201
+2023-02-27 22:28:55,076 - mmhuman3d - INFO - Epoch [1][400/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 6:22:20, time: 13.207, data_time: 11.141, memory: 6989, keypoints3d_loss: 0.9232, keypoints2d_loss: 0.2677, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1674, adv_loss: 0.2726, loss: 1.6309
+2023-02-27 22:40:20,601 - mmhuman3d - INFO - Epoch [1][450/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 9:03:32, time: 13.710, data_time: 8.417, memory: 6989, keypoints3d_loss: 0.8542, keypoints2d_loss: 0.2526, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1641, adv_loss: 0.2698, loss: 1.5406
+2023-02-27 22:51:12,359 - mmhuman3d - INFO - Epoch [1][500/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 2:01:24, time: 13.035, data_time: 0.227, memory: 6989, keypoints3d_loss: 0.8196, keypoints2d_loss: 0.2432, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1598, adv_loss: 0.2659, loss: 1.4886
+2023-02-27 23:02:19,565 - mmhuman3d - INFO - Epoch [1][550/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 0:03:11, time: 13.345, data_time: 4.692, memory: 6989, keypoints3d_loss: 0.7763, keypoints2d_loss: 0.2360, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1556, adv_loss: 0.2674, loss: 1.4352
+2023-02-27 23:13:36,017 - mmhuman3d - INFO - Epoch [1][600/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 0:25:58, time: 13.527, data_time: 5.083, memory: 6989, keypoints3d_loss: 0.7672, keypoints2d_loss: 0.2185, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1513, adv_loss: 0.2688, loss: 1.4059
+2023-02-27 23:24:41,990 - mmhuman3d - INFO - Epoch [1][650/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 22:35:11, time: 13.322, data_time: 12.675, memory: 6989, keypoints3d_loss: 0.7287, keypoints2d_loss: 0.2062, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1455, adv_loss: 0.2676, loss: 1.3480
+2023-02-27 23:35:54,514 - mmhuman3d - INFO - Epoch [1][700/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 22:13:21, time: 13.450, data_time: 4.492, memory: 6989, keypoints3d_loss: 0.7129, keypoints2d_loss: 0.2140, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1409, adv_loss: 0.2696, loss: 1.3375
+2023-02-27 23:47:38,288 - mmhuman3d - INFO - Epoch [1][750/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 3:30:32, time: 14.074, data_time: 0.117, memory: 6989, keypoints3d_loss: 0.6917, keypoints2d_loss: 0.1964, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1365, adv_loss: 0.2733, loss: 1.2980
+2023-02-27 23:58:33,212 - mmhuman3d - INFO - Epoch [1][800/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 23:52:03, time: 13.099, data_time: 0.298, memory: 6989, keypoints3d_loss: 0.7096, keypoints2d_loss: 0.1989, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1319, adv_loss: 0.2747, loss: 1.3151
+2023-02-28 00:09:45,765 - mmhuman3d - INFO - Epoch [1][850/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 23:25:56, time: 13.451, data_time: 10.484, memory: 6989, keypoints3d_loss: 0.6707, keypoints2d_loss: 0.1911, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1277, adv_loss: 0.2763, loss: 1.2658
+2023-02-28 00:21:04,085 - mmhuman3d - INFO - Epoch [1][900/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 23:53:13, time: 13.566, data_time: 4.746, memory: 6989, keypoints3d_loss: 0.6662, keypoints2d_loss: 0.1899, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1245, adv_loss: 0.2759, loss: 1.2565
+2023-02-28 00:32:39,740 - mmhuman3d - INFO - Epoch [1][950/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 2:44:51, time: 13.914, data_time: 13.249, memory: 6989, keypoints3d_loss: 0.6283, keypoints2d_loss: 0.1882, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1206, adv_loss: 0.2763, loss: 1.2133
+2023-02-28 00:43:59,847 - mmhuman3d - INFO - Epoch [1][1000/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 3:11:51, time: 13.602, data_time: 1.210, memory: 6989, keypoints3d_loss: 0.6210, keypoints2d_loss: 0.1907, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1169, adv_loss: 0.2755, loss: 1.2042
+2023-02-28 00:55:07,633 - mmhuman3d - INFO - Epoch [1][1050/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 1:59:43, time: 13.355, data_time: 0.328, memory: 6989, keypoints3d_loss: 0.6139, keypoints2d_loss: 0.1751, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1141, adv_loss: 0.2759, loss: 1.1790
+2023-02-28 01:06:34,937 - mmhuman3d - INFO - Epoch [1][1100/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 76 days, 3:16:55, time: 13.745, data_time: 0.019, memory: 6989, keypoints3d_loss: 0.5931, keypoints2d_loss: 0.1712, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1100, adv_loss: 0.2741, loss: 1.1484
+2023-02-28 01:17:16,002 - mmhuman3d - INFO - Epoch [1][1150/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 23:01:20, time: 12.823, data_time: 0.687, memory: 6989, keypoints3d_loss: 0.5915, keypoints2d_loss: 0.1659, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1075, adv_loss: 0.2752, loss: 1.1401
+2023-02-28 01:28:14,405 - mmhuman3d - INFO - Epoch [1][1200/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 21:02:35, time: 13.168, data_time: 7.072, memory: 6989, keypoints3d_loss: 0.5691, keypoints2d_loss: 0.1654, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1047, adv_loss: 0.2737, loss: 1.1129
+2023-02-28 01:39:16,113 - mmhuman3d - INFO - Epoch [1][1250/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 19:34:07, time: 13.234, data_time: 9.534, memory: 6989, keypoints3d_loss: 0.5496, keypoints2d_loss: 0.1486, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.1012, adv_loss: 0.2732, loss: 1.0726
+2023-02-28 01:50:24,999 - mmhuman3d - INFO - Epoch [1][1300/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 18:56:18, time: 13.378, data_time: 0.570, memory: 6989, keypoints3d_loss: 0.5474, keypoints2d_loss: 0.1544, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0986, adv_loss: 0.2718, loss: 1.0721
+2023-02-28 02:01:05,183 - mmhuman3d - INFO - Epoch [1][1350/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 15:27:59, time: 12.803, data_time: 5.300, memory: 6989, keypoints3d_loss: 0.5292, keypoints2d_loss: 0.1494, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0956, adv_loss: 0.2708, loss: 1.0450
+2023-02-28 02:12:18,575 - mmhuman3d - INFO - Epoch [1][1400/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 15:26:15, time: 13.468, data_time: 12.836, memory: 6989, keypoints3d_loss: 0.5417, keypoints2d_loss: 0.1503, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0941, adv_loss: 0.2707, loss: 1.0568
+2023-02-28 02:23:03,572 - mmhuman3d - INFO - Epoch [1][1450/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 12:45:02, time: 12.900, data_time: 10.184, memory: 6989, keypoints3d_loss: 0.5405, keypoints2d_loss: 0.1477, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0930, adv_loss: 0.2693, loss: 1.0506
+2023-02-28 02:34:18,535 - mmhuman3d - INFO - Epoch [1][1500/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 12:55:32, time: 13.498, data_time: 1.472, memory: 6989, keypoints3d_loss: 0.5579, keypoints2d_loss: 0.1454, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0911, adv_loss: 0.2698, loss: 1.0642
+2023-02-28 02:45:34,056 - mmhuman3d - INFO - Epoch [1][1550/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 13:07:42, time: 13.510, data_time: 0.121, memory: 6989, keypoints3d_loss: 0.5223, keypoints2d_loss: 0.1471, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0901, adv_loss: 0.2715, loss: 1.0310
+2023-02-28 02:56:33,308 - mmhuman3d - INFO - Epoch [1][1600/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 11:56:23, time: 13.186, data_time: 9.003, memory: 6989, keypoints3d_loss: 0.5245, keypoints2d_loss: 0.1378, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0889, adv_loss: 0.2719, loss: 1.0231
+2023-02-28 03:07:13,376 - mmhuman3d - INFO - Epoch [1][1650/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 9:14:13, time: 12.801, data_time: 7.571, memory: 6989, keypoints3d_loss: 0.5237, keypoints2d_loss: 0.1417, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0878, adv_loss: 0.2716, loss: 1.0248
+2023-02-28 03:17:56,009 - mmhuman3d - INFO - Epoch [1][1700/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 6:52:59, time: 12.852, data_time: 9.048, memory: 6989, keypoints3d_loss: 0.5219, keypoints2d_loss: 0.1435, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0865, adv_loss: 0.2738, loss: 1.0257
+2023-02-28 03:29:02,082 - mmhuman3d - INFO - Epoch [1][1750/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 6:27:53, time: 13.321, data_time: 0.309, memory: 6989, keypoints3d_loss: 0.4948, keypoints2d_loss: 0.1288, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0852, adv_loss: 0.2756, loss: 0.9843
+2023-02-28 03:40:18,285 - mmhuman3d - INFO - Epoch [1][1800/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 6:49:14, time: 13.524, data_time: 0.018, memory: 6989, keypoints3d_loss: 0.5047, keypoints2d_loss: 0.1368, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0847, adv_loss: 0.2774, loss: 1.0036
+2023-02-28 03:51:27,042 - mmhuman3d - INFO - Epoch [1][1850/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 6:36:16, time: 13.376, data_time: 3.702, memory: 6989, keypoints3d_loss: 0.5048, keypoints2d_loss: 0.1355, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0836, adv_loss: 0.2755, loss: 0.9994
+2023-02-28 04:02:20,956 - mmhuman3d - INFO - Epoch [1][1900/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 5:19:56, time: 13.078, data_time: 0.032, memory: 6989, keypoints3d_loss: 0.5703, keypoints2d_loss: 0.1504, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0855, adv_loss: 0.2770, loss: 1.0832
+2023-02-28 04:13:22,533 - mmhuman3d - INFO - Epoch [1][1950/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 4:38:51, time: 13.231, data_time: 8.500, memory: 6989, keypoints3d_loss: 0.5673, keypoints2d_loss: 0.1458, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0852, adv_loss: 0.2772, loss: 1.0755
+2023-02-28 04:24:15,586 - mmhuman3d - INFO - Epoch [1][2000/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 3:24:40, time: 13.060, data_time: 0.727, memory: 6989, keypoints3d_loss: 0.4985, keypoints2d_loss: 0.1360, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0828, adv_loss: 0.2768, loss: 0.9941
+2023-02-28 04:35:05,794 - mmhuman3d - INFO - Epoch [1][2050/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 2:02:36, time: 13.005, data_time: 0.502, memory: 6989, keypoints3d_loss: 0.4575, keypoints2d_loss: 0.1238, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0806, adv_loss: 0.2760, loss: 0.9379
+2023-02-28 04:46:00,453 - mmhuman3d - INFO - Epoch [1][2100/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 75 days, 1:00:55, time: 13.093, data_time: 0.323, memory: 6989, keypoints3d_loss: 0.4628, keypoints2d_loss: 0.1240, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0794, adv_loss: 0.2739, loss: 0.9401
+2023-02-28 04:56:34,657 - mmhuman3d - INFO - Epoch [1][2150/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 74 days, 22:44:44, time: 12.685, data_time: 2.485, memory: 6989, keypoints3d_loss: 0.4707, keypoints2d_loss: 0.1222, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0788, adv_loss: 0.2731, loss: 0.9447
+2023-02-28 05:07:25,883 - mmhuman3d - INFO - Epoch [1][2200/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 74 days, 21:36:47, time: 13.025, data_time: 6.306, memory: 6989, keypoints3d_loss: 0.4998, keypoints2d_loss: 0.1297, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0796, adv_loss: 0.2725, loss: 0.9816
+2023-02-28 05:18:19,485 - mmhuman3d - INFO - Epoch [1][2250/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 74 days, 20:39:42, time: 13.071, data_time: 2.379, memory: 6989, keypoints3d_loss: 0.4724, keypoints2d_loss: 0.1272, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0796, adv_loss: 0.2729, loss: 0.9521
+2023-02-28 05:29:07,635 - mmhuman3d - INFO - Epoch [1][2300/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 74 days, 19:25:43, time: 12.963, data_time: 7.876, memory: 6989, keypoints3d_loss: 0.4516, keypoints2d_loss: 0.1212, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0772, adv_loss: 0.2720, loss: 0.9220
+2023-02-28 05:40:02,956 - mmhuman3d - INFO - Epoch [1][2350/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 74 days, 18:39:01, time: 13.106, data_time: 0.018, memory: 6989, keypoints3d_loss: 0.4526, keypoints2d_loss: 0.1179, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0765, adv_loss: 0.2730, loss: 0.9199
+2023-02-28 05:50:49,219 - mmhuman3d - INFO - Epoch [1][2400/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 74 days, 17:23:14, time: 12.925, data_time: 8.508, memory: 6989, keypoints3d_loss: 0.4255, keypoints2d_loss: 0.1148, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0762, adv_loss: 0.2726, loss: 0.8892
+2023-02-28 05:59:29,454 - mmhuman3d - INFO - Saving checkpoint at 1 epochs
+2023-02-28 06:10:44,878 - mmhuman3d - INFO - Epoch [2][50/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 13:26:48, time: 13.479, data_time: 1.467, memory: 6989, keypoints3d_loss: 0.4267, keypoints2d_loss: 0.1160, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0760, adv_loss: 0.2733, loss: 0.8920
+2023-02-28 06:21:49,041 - mmhuman3d - INFO - Epoch [2][100/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 13:45:41, time: 13.283, data_time: 2.023, memory: 6989, keypoints3d_loss: 0.4358, keypoints2d_loss: 0.1133, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0743, adv_loss: 0.2709, loss: 0.8943
+2023-02-28 06:33:03,177 - mmhuman3d - INFO - Epoch [2][150/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 14:34:43, time: 13.483, data_time: 2.622, memory: 6989, keypoints3d_loss: 0.4649, keypoints2d_loss: 0.1229, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0752, adv_loss: 0.2734, loss: 0.9364
+2023-02-28 06:44:20,554 - mmhuman3d - INFO - Epoch [2][200/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 15:31:10, time: 13.547, data_time: 0.019, memory: 6989, keypoints3d_loss: 0.4382, keypoints2d_loss: 0.1132, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0747, adv_loss: 0.2732, loss: 0.8994
+2023-02-28 06:55:03,792 - mmhuman3d - INFO - Epoch [2][250/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 14:42:40, time: 12.865, data_time: 6.517, memory: 6989, keypoints3d_loss: 0.4361, keypoints2d_loss: 0.1140, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0735, adv_loss: 0.2723, loss: 0.8959
+2023-02-28 07:05:33,044 - mmhuman3d - INFO - Epoch [2][300/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 13:14:10, time: 12.585, data_time: 2.877, memory: 6989, keypoints3d_loss: 0.4293, keypoints2d_loss: 0.1173, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0738, adv_loss: 0.2721, loss: 0.8926
+2023-02-28 07:16:24,637 - mmhuman3d - INFO - Epoch [2][350/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 12:53:10, time: 13.032, data_time: 3.337, memory: 6989, keypoints3d_loss: 0.4070, keypoints2d_loss: 0.1136, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0724, adv_loss: 0.2725, loss: 0.8656
+2023-02-28 07:27:46,718 - mmhuman3d - INFO - Epoch [2][400/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 13:59:20, time: 13.641, data_time: 0.034, memory: 6989, keypoints3d_loss: 0.4165, keypoints2d_loss: 0.1098, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0721, adv_loss: 0.2707, loss: 0.8690
+2023-02-28 07:38:47,021 - mmhuman3d - INFO - Epoch [2][450/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 14:01:52, time: 13.206, data_time: 0.019, memory: 6989, keypoints3d_loss: 0.4335, keypoints2d_loss: 0.1098, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0720, adv_loss: 0.2722, loss: 0.8876
+2023-02-28 07:49:32,657 - mmhuman3d - INFO - Epoch [2][500/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 13:23:48, time: 12.914, data_time: 5.707, memory: 6989, keypoints3d_loss: 0.4415, keypoints2d_loss: 0.1206, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0735, adv_loss: 0.2719, loss: 0.9075
+2023-02-28 08:00:28,350 - mmhuman3d - INFO - Epoch [2][550/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 13:13:42, time: 13.114, data_time: 3.606, memory: 6989, keypoints3d_loss: 0.4077, keypoints2d_loss: 0.1096, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0721, adv_loss: 0.2727, loss: 0.8621
+2023-02-28 08:11:44,716 - mmhuman3d - INFO - Epoch [2][600/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 13:58:32, time: 13.527, data_time: 9.864, memory: 6989, keypoints3d_loss: 0.3973, keypoints2d_loss: 0.1015, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0707, adv_loss: 0.2722, loss: 0.8417
+2023-02-28 08:22:14,569 - mmhuman3d - INFO - Epoch [2][650/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 12:39:51, time: 12.597, data_time: 0.521, memory: 6989, keypoints3d_loss: 0.4371, keypoints2d_loss: 0.1190, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0729, adv_loss: 0.2712, loss: 0.9002
+2023-02-28 08:32:49,828 - mmhuman3d - INFO - Epoch [2][700/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 11:37:22, time: 12.706, data_time: 0.662, memory: 6989, keypoints3d_loss: 0.4466, keypoints2d_loss: 0.1229, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0735, adv_loss: 0.2751, loss: 0.9180
+2023-02-28 08:43:45,300 - mmhuman3d - INFO - Epoch [2][750/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 11:27:39, time: 13.109, data_time: 0.434, memory: 6989, keypoints3d_loss: 0.4163, keypoints2d_loss: 0.1198, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0729, adv_loss: 0.2700, loss: 0.8789
+2023-02-28 08:54:20,011 - mmhuman3d - INFO - Epoch [2][800/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 10:25:59, time: 12.693, data_time: 0.614, memory: 6989, keypoints3d_loss: 0.5060, keypoints2d_loss: 0.1276, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0764, adv_loss: 0.2737, loss: 0.9836
+2023-02-28 09:04:59,273 - mmhuman3d - INFO - Epoch [2][850/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 9:37:20, time: 12.786, data_time: 0.070, memory: 6989, keypoints3d_loss: 0.4490, keypoints2d_loss: 0.1188, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0748, adv_loss: 0.2711, loss: 0.9138
+2023-02-28 09:15:32,925 - mmhuman3d - INFO - Epoch [2][900/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 8:36:02, time: 12.672, data_time: 3.733, memory: 6989, keypoints3d_loss: 0.4148, keypoints2d_loss: 0.1116, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0718, adv_loss: 0.2719, loss: 0.8701
+2023-02-28 09:26:19,726 - mmhuman3d - INFO - Epoch [2][950/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 8:07:41, time: 12.936, data_time: 9.314, memory: 6989, keypoints3d_loss: 0.3938, keypoints2d_loss: 0.1054, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0709, adv_loss: 0.2715, loss: 0.8416
+2023-02-28 09:36:52,407 - mmhuman3d - INFO - Epoch [2][1000/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 7:06:40, time: 12.654, data_time: 0.810, memory: 6989, keypoints3d_loss: 0.4428, keypoints2d_loss: 0.1188, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0721, adv_loss: 0.2718, loss: 0.9055
+2023-02-28 09:47:28,395 - mmhuman3d - INFO - Epoch [2][1050/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 6:14:41, time: 12.719, data_time: 1.353, memory: 6989, keypoints3d_loss: 0.4422, keypoints2d_loss: 0.1243, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0737, adv_loss: 0.2721, loss: 0.9123
+2023-02-28 09:58:10,338 - mmhuman3d - INFO - Epoch [2][1100/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 5:37:30, time: 12.839, data_time: 1.547, memory: 6989, keypoints3d_loss: 0.4055, keypoints2d_loss: 0.1162, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0717, adv_loss: 0.2715, loss: 0.8649
+2023-02-28 10:09:15,364 - mmhuman3d - INFO - Epoch [2][1150/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 5:52:56, time: 13.300, data_time: 0.018, memory: 6989, keypoints3d_loss: 0.3946, keypoints2d_loss: 0.1055, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0705, adv_loss: 0.2728, loss: 0.8433
+2023-02-28 10:20:05,862 - mmhuman3d - INFO - Epoch [2][1200/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 5:35:31, time: 13.010, data_time: 1.622, memory: 6989, keypoints3d_loss: 0.3944, keypoints2d_loss: 0.1023, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0688, adv_loss: 0.2713, loss: 0.8369
+2023-02-28 10:30:36,351 - mmhuman3d - INFO - Epoch [2][1250/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 4:34:23, time: 12.609, data_time: 7.592, memory: 6989, keypoints3d_loss: 0.3618, keypoints2d_loss: 0.1007, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0683, adv_loss: 0.2722, loss: 0.8029
+2023-02-28 10:41:23,306 - mmhuman3d - INFO - Epoch [2][1300/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 4:10:06, time: 12.938, data_time: 2.480, memory: 6989, keypoints3d_loss: 0.3577, keypoints2d_loss: 0.1008, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0674, adv_loss: 0.2700, loss: 0.7959
+2023-02-28 10:52:09,049 - mmhuman3d - INFO - Epoch [2][1350/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 3:43:46, time: 12.916, data_time: 4.821, memory: 6989, keypoints3d_loss: 0.3659, keypoints2d_loss: 0.0985, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0683, adv_loss: 0.2699, loss: 0.8027
+2023-02-28 11:03:17,049 - mmhuman3d - INFO - Epoch [2][1400/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 4:04:26, time: 13.359, data_time: 0.017, memory: 6989, keypoints3d_loss: 0.3733, keypoints2d_loss: 0.0986, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0671, adv_loss: 0.2710, loss: 0.8100
+2023-02-28 11:14:15,609 - mmhuman3d - INFO - Epoch [2][1450/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 4:04:55, time: 13.172, data_time: 0.147, memory: 6989, keypoints3d_loss: 0.3718, keypoints2d_loss: 0.1044, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0683, adv_loss: 0.2699, loss: 0.8144
+2023-02-28 11:25:12,827 - mmhuman3d - INFO - Epoch [2][1500/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 4:02:13, time: 13.144, data_time: 0.017, memory: 6989, keypoints3d_loss: 0.3674, keypoints2d_loss: 0.0987, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0674, adv_loss: 0.2704, loss: 0.8039
+2023-02-28 11:36:09,102 - mmhuman3d - INFO - Epoch [2][1550/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 3:57:23, time: 13.125, data_time: 0.047, memory: 6989, keypoints3d_loss: 0.3650, keypoints2d_loss: 0.0980, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0668, adv_loss: 0.2710, loss: 0.8009
+2023-02-28 11:47:24,336 - mmhuman3d - INFO - Epoch [2][1600/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 4:30:15, time: 13.504, data_time: 0.019, memory: 6989, keypoints3d_loss: 0.3565, keypoints2d_loss: 0.1019, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0670, adv_loss: 0.2715, loss: 0.7969
+2023-02-28 11:58:00,875 - mmhuman3d - INFO - Epoch [2][1650/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 3:45:48, time: 12.731, data_time: 0.793, memory: 6989, keypoints3d_loss: 0.3660, keypoints2d_loss: 0.0999, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0670, adv_loss: 0.2705, loss: 0.8034
+2023-02-28 12:09:08,139 - mmhuman3d - INFO - Epoch [2][1700/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 4:02:01, time: 13.346, data_time: 6.778, memory: 6989, keypoints3d_loss: 0.3568, keypoints2d_loss: 0.0976, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0661, adv_loss: 0.2707, loss: 0.7913
+2023-02-28 12:19:33,788 - mmhuman3d - INFO - Epoch [2][1750/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 2:57:32, time: 12.513, data_time: 11.876, memory: 6989, keypoints3d_loss: 0.3737, keypoints2d_loss: 0.1073, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0666, adv_loss: 0.2696, loss: 0.8172
+2023-02-28 12:30:04,064 - mmhuman3d - INFO - Epoch [2][1800/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 2:03:03, time: 12.605, data_time: 4.818, memory: 6989, keypoints3d_loss: 0.3892, keypoints2d_loss: 0.1090, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0675, adv_loss: 0.2699, loss: 0.8356
+2023-02-28 12:41:06,694 - mmhuman3d - INFO - Epoch [2][1850/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 2:10:24, time: 13.253, data_time: 2.989, memory: 6989, keypoints3d_loss: 0.3477, keypoints2d_loss: 0.0989, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0662, adv_loss: 0.2680, loss: 0.7808
+2023-02-28 12:52:03,527 - mmhuman3d - INFO - Epoch [2][1900/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 2:06:33, time: 13.137, data_time: 0.017, memory: 6989, keypoints3d_loss: 0.3439, keypoints2d_loss: 0.0956, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0653, adv_loss: 0.2671, loss: 0.7718
+2023-02-28 13:02:33,018 - mmhuman3d - INFO - Epoch [2][1950/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 1:12:21, time: 12.590, data_time: 1.266, memory: 6989, keypoints3d_loss: 0.3419, keypoints2d_loss: 0.0944, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0656, adv_loss: 0.2671, loss: 0.7690
+2023-02-28 13:14:45,287 - mmhuman3d - INFO - Epoch [2][2000/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 3:25:40, time: 14.645, data_time: 0.257, memory: 6989, keypoints3d_loss: 0.3332, keypoints2d_loss: 0.0952, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0641, adv_loss: 0.2672, loss: 0.7597
+2023-02-28 13:25:29,520 - mmhuman3d - INFO - Epoch [2][2050/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 2:57:39, time: 12.883, data_time: 0.018, memory: 6989, keypoints3d_loss: 0.3420, keypoints2d_loss: 0.0905, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0647, adv_loss: 0.2656, loss: 0.7628
+2023-02-28 13:36:30,792 - mmhuman3d - INFO - Epoch [2][2100/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 3:00:26, time: 13.226, data_time: 0.330, memory: 6989, keypoints3d_loss: 0.3291, keypoints2d_loss: 0.0936, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0645, adv_loss: 0.2632, loss: 0.7503
+2023-02-28 13:47:13,051 - mmhuman3d - INFO - Epoch [2][2150/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 2:29:30, time: 12.845, data_time: 7.759, memory: 6989, keypoints3d_loss: 0.3506, keypoints2d_loss: 0.0975, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0648, adv_loss: 0.2641, loss: 0.7770
+2023-02-28 13:57:57,351 - mmhuman3d - INFO - Epoch [2][2200/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 2:02:35, time: 12.887, data_time: 1.018, memory: 6989, keypoints3d_loss: 0.3402, keypoints2d_loss: 0.0998, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0643, adv_loss: 0.2644, loss: 0.7687
+2023-02-28 14:08:46,006 - mmhuman3d - INFO - Epoch [2][2250/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 1:43:20, time: 12.972, data_time: 8.123, memory: 6989, keypoints3d_loss: 0.3378, keypoints2d_loss: 0.0946, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0635, adv_loss: 0.2653, loss: 0.7613
+2023-02-28 14:19:23,674 - mmhuman3d - INFO - Epoch [2][2300/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 1:05:44, time: 12.754, data_time: 2.897, memory: 6989, keypoints3d_loss: 0.3375, keypoints2d_loss: 0.0962, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0632, adv_loss: 0.2644, loss: 0.7613
+2023-02-28 14:33:53,604 - mmhuman3d - INFO - Epoch [2][2350/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 73 days, 6:59:05, time: 17.399, data_time: 1.018, memory: 6989, keypoints3d_loss: 0.3286, keypoints2d_loss: 0.0935, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0620, adv_loss: 0.2642, loss: 0.7483
+2023-02-28 15:00:03,809 - mmhuman3d - INFO - Epoch [2][2400/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 74 days, 8:09:44, time: 31.404, data_time: 1.611, memory: 6989, keypoints3d_loss: 0.3242, keypoints2d_loss: 0.0897, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0617, adv_loss: 0.2640, loss: 0.7395
+2023-02-28 15:19:35,741 - mmhuman3d - INFO - Saving checkpoint at 2 epochs
+2023-02-28 15:48:32,948 - mmhuman3d - INFO - Epoch [3][50/2439]	lr_backbone: 2.000e-04 lr_head: 2.000e-04 lr_disc: 1.000e-04, eta: 74 days, 22:51:09, time: 34.709, data_time: 4.976, memory: 6989, keypoints3d_loss: 0.3069, keypoints2d_loss: 0.0843, vertex_loss: 0.0000, smpl_pose_loss: 0.0000, smpl_betas_loss: 0.0000, heatmap2d_loss: 0.0601, adv_loss: 0.2643, loss: 0.7156
