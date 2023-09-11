@@ -16,7 +16,7 @@ from mmhuman3d.utils.demo_utils import box2cs, xywh2xyxy, xyxy2xywh
 Sequence = Union[np.ndarray, torch.Tensor, list, tuple]
 
 
-def init_model(config, checkpoint=None, device='cuda:0'):
+def init_model(config, checkpoint=None, device="cuda:0"):
     """Initialize a model from config file.
 
     Args:
@@ -32,8 +32,9 @@ def init_model(config, checkpoint=None, device='cuda:0'):
     if isinstance(config, str):
         config = mmcv.Config.fromfile(config)
     elif not isinstance(config, mmcv.Config):
-        raise TypeError('config must be a filename or Config object, '
-                        f'but got {type(config)}')
+        raise TypeError(
+            "config must be a filename or Config object, " f"but got {type(config)}"
+        )
     config.data.test.test_mode = True
 
     model = build_architecture(config.model)
@@ -41,7 +42,7 @@ def init_model(config, checkpoint=None, device='cuda:0'):
         try:
             model.init_weights()
         except Exception as e:
-            print_log(f'init model weights failed, please check: {e}')
+            print_log(f"init model weights failed, please check: {e}")
     if checkpoint is not None:
         # load model checkpoint
         load_checkpoint(model, checkpoint, map_location=device)
@@ -51,7 +52,7 @@ def init_model(config, checkpoint=None, device='cuda:0'):
     model.eval()
 
     extractor = None
-    if config.model.type == 'VideoBodyModelEstimator':
+    if config.model.type == "VideoBodyModelEstimator":
         extractor = build_backbone(config.extractor.backbone)
         if config.extractor.checkpoint is not None:
             # load model checkpoint
@@ -65,7 +66,7 @@ def init_model(config, checkpoint=None, device='cuda:0'):
 class LoadImage:
     """A simple pipeline to load image."""
 
-    def __init__(self, color_type='color', channel_order='bgr'):
+    def __init__(self, color_type="color", channel_order="bgr"):
         self.color_type = color_type
         self.channel_order = channel_order
 
@@ -78,21 +79,24 @@ class LoadImage:
         Returns:
             dict: ``results`` will be returned containing loaded image.
         """
-        if isinstance(results['image_path'], str):
-            results['image_file'] = results['image_path']
-            img = mmcv.imread(results['image_path'], self.color_type,
-                              self.channel_order)
-        elif isinstance(results['image_path'], np.ndarray):
-            results['image_file'] = ''
-            if self.color_type == 'color' and self.channel_order == 'rgb':
-                img = cv2.cvtColor(results['image_path'], cv2.COLOR_BGR2RGB)
+        if isinstance(results["image_path"], str):
+            results["image_file"] = results["image_path"]
+            img = mmcv.imread(
+                results["image_path"], self.color_type, self.channel_order
+            )
+        elif isinstance(results["image_path"], np.ndarray):
+            results["image_file"] = ""
+            if self.color_type == "color" and self.channel_order == "rgb":
+                img = cv2.cvtColor(results["image_path"], cv2.COLOR_BGR2RGB)
             else:
-                img = results['image_path']
+                img = results["image_path"]
         else:
-            raise TypeError('"image_path" must be a numpy array or a str or '
-                            'a pathlib.Path object')
+            raise TypeError(
+                '"image_path" must be a numpy array or a str or '
+                "a pathlib.Path object"
+            )
 
-        results['img'] = img
+        results["img"] = img
         return results
 
 
@@ -101,7 +105,7 @@ def inference_image_based_model(
     img_or_path,
     det_results,
     bbox_thr=None,
-    format='xywh',
+    format="xywh",
 ):
     """Inference a single image with a list of person bounding boxes.
 
@@ -126,13 +130,13 @@ def inference_image_based_model(
             SMPL parameters, vertices, kp3d, and camera.
     """
     # only two kinds of bbox format is supported.
-    assert format in ['xyxy', 'xywh']
+    assert format in ["xyxy", "xywh"]
     mesh_results = []
     if len(det_results) == 0:
         return []
 
     # Change for-loop preprocess each bbox to preprocess all bboxes at once.
-    bboxes = np.array([box['bbox'] for box in det_results])
+    bboxes = np.array([box["bbox"] for box in det_results])
 
     # Select bboxes by score threshold
     if bbox_thr is not None:
@@ -141,7 +145,7 @@ def inference_image_based_model(
         bboxes = bboxes[valid_idx]
         det_results = [det_results[i] for i in valid_idx]
 
-    if format == 'xyxy':
+    if format == "xyxy":
         bboxes_xyxy = bboxes
         bboxes_xywh = xyxy2xywh(bboxes)
     else:
@@ -163,20 +167,19 @@ def inference_image_based_model(
     assert len(bboxes[0]) in [4, 5]
 
     batch_data = []
-    input_size = cfg['img_res']
-    aspect_ratio = 1 if isinstance(input_size,
-                                   int) else input_size[0] / input_size[1]
+    input_size = cfg["img_res"]
+    aspect_ratio = 1 if isinstance(input_size, int) else input_size[0] / input_size[1]
 
     for i, bbox in enumerate(bboxes_xywh):
         center, scale = box2cs(bbox, aspect_ratio, bbox_scale_factor=1.25)
         # prepare data
         data = {
-            'image_path': img_or_path,
-            'center': center,
-            'scale': scale,
-            'rotation': 0,
-            'bbox_score': bbox[4] if len(bbox) == 5 else 1,
-            'sample_idx': i,
+            "image_path": img_or_path,
+            "center": center,
+            "scale": scale,
+            "rotation": 0,
+            "bbox_score": bbox[4] if len(bbox) == 5 else 1,
+            "sample_idx": i,
         }
         data = inference_pipeline(data)
         batch_data.append(data)
@@ -185,34 +188,56 @@ def inference_image_based_model(
 
     if next(model.parameters()).is_cuda:
         # scatter not work so just move image to cuda device
-        batch_data['img'] = batch_data['img'].to(device)
+        batch_data["img"] = batch_data["img"].to(device)
 
     # get all img_metas of each bounding box
-    batch_data['img_metas'] = [
-        img_metas[0] for img_metas in batch_data['img_metas'].data
+    batch_data["img_metas"] = [
+        img_metas[0] for img_metas in batch_data["img_metas"].data
     ]
 
     # forward the model
     with torch.no_grad():
         results = model(
-            img=batch_data['img'],
-            img_metas=batch_data['img_metas'],
-            sample_idx=batch_data['sample_idx'],
+            img=batch_data["img"],
+            img_metas=batch_data["img_metas"],
+            sample_idx=batch_data["sample_idx"],
         )
 
+    # 用于从heatmap得到2d keypoints
+    crop_trans = []
+    for idx in range(len(det_results)):
+        trans = batch_data["img_metas"][idx]["crop_transform"]
+        crop_trans.append(trans)
+
+    # 得到pelvis坐标
+    pelvis = get_pelvis_2d(results["heatmaps_2d"], crop_trans)
+    results["pelvis"] = pelvis
+
+    keypoints_2d = heatmap_to_keypoints2d(results["heatmaps_2d"], crop_trans)
+    del results["heatmaps_2d"]
+    results["keypoints_2d"] = keypoints_2d
+
+    # 整合mesh_result的结果
     for idx in range(len(det_results)):
         mesh_result = det_results[idx].copy()
-        mesh_result['bbox'] = bboxes_xyxy[idx]
+        mesh_result["bbox"] = bboxes_xyxy[idx]
         for key, value in results.items():
             mesh_result[key] = _indexing_sequence(value, index=idx)
         mesh_results.append(mesh_result)
+
+    # 可视化2d关键点, 只可视化第一个person的
+    vis_keypoints_2d(
+        image=mesh_results[0]["image_path"],
+        keypoints=mesh_results[0]["keypoints_2d"],
+        pelvis=pelvis[0],
+    )
+
     return mesh_results
 
 
-def inference_video_based_model(model,
-                                extracted_results,
-                                with_track_id=True,
-                                causal=True):
+def inference_video_based_model(
+    model, extracted_results, with_track_id=True, causal=True
+):
     """Inference SMPL parameters from extracted featutres using a video-based
     model.
 
@@ -249,18 +274,18 @@ def inference_video_based_model(model,
     target_idx = 0 if causal else len(extracted_results) // 2
 
     input_features = _gather_input_features(extracted_results)
-    feature_sequences = _collate_feature_sequence(input_features,
-                                                  with_track_id, target_idx)
+    feature_sequences = _collate_feature_sequence(
+        input_features, with_track_id, target_idx
+    )
     if not feature_sequences:
         return mesh_results
 
     batch_data = []
 
     for i, seq in enumerate(feature_sequences):
-
         data = {
-            'features': seq['features'],
-            'sample_idx': i,
+            "features": seq["features"],
+            "sample_idx": i,
         }
 
         data = inference_pipeline(data)
@@ -270,33 +295,32 @@ def inference_video_based_model(model,
 
     if next(model.parameters()).is_cuda:
         # scatter not work so just move image to cuda device
-        batch_data['features'] = batch_data['features'].to(device)
+        batch_data["features"] = batch_data["features"].to(device)
 
     with torch.no_grad():
         results = model(
-            features=batch_data['features'],
-            img_metas=batch_data['img_metas'],
-            sample_idx=batch_data['sample_idx'])
+            features=batch_data["features"],
+            img_metas=batch_data["img_metas"],
+            sample_idx=batch_data["sample_idx"],
+        )
 
-    results['camera'] = results['camera'].reshape(-1, seq_len, 3)
-    results['smpl_pose'] = results['smpl_pose'].reshape(-1, seq_len, 24, 3, 3)
-    results['smpl_beta'] = results['smpl_beta'].reshape(-1, seq_len, 10)
-    results['vertices'] = results['vertices'].reshape(-1, seq_len, 6890, 3)
-    results['keypoints_3d'] = results['keypoints_3d'].reshape(
-        -1, seq_len, 17, 3)
+    results["camera"] = results["camera"].reshape(-1, seq_len, 3)
+    results["smpl_pose"] = results["smpl_pose"].reshape(-1, seq_len, 24, 3, 3)
+    results["smpl_beta"] = results["smpl_beta"].reshape(-1, seq_len, 10)
+    results["vertices"] = results["vertices"].reshape(-1, seq_len, 6890, 3)
+    results["keypoints_3d"] = results["keypoints_3d"].reshape(-1, seq_len, 17, 3)
 
     for idx in range(len(feature_sequences)):
         mesh_result = dict()
-        mesh_result['camera'] = results['camera'][idx, target_idx]
-        mesh_result['smpl_pose'] = results['smpl_pose'][idx, target_idx]
-        mesh_result['smpl_beta'] = results['smpl_beta'][idx, target_idx]
-        mesh_result['vertices'] = results['vertices'][idx, target_idx]
-        mesh_result['keypoints_3d'] = results['keypoints_3d'][idx, target_idx]
-        mesh_result['bbox'] = extracted_results[target_idx][idx]['bbox']
+        mesh_result["camera"] = results["camera"][idx, target_idx]
+        mesh_result["smpl_pose"] = results["smpl_pose"][idx, target_idx]
+        mesh_result["smpl_beta"] = results["smpl_beta"][idx, target_idx]
+        mesh_result["vertices"] = results["vertices"][idx, target_idx]
+        mesh_result["keypoints_3d"] = results["keypoints_3d"][idx, target_idx]
+        mesh_result["bbox"] = extracted_results[target_idx][idx]["bbox"]
         # 'track_id' is not included in results generated by mmdet
-        if 'track_id' in extracted_results[target_idx][idx].keys():
-            mesh_result['track_id'] = extracted_results[target_idx][idx][
-                'track_id']
+        if "track_id" in extracted_results[target_idx][idx].keys():
+            mesh_result["track_id"] = extracted_results[target_idx][idx]["track_id"]
         mesh_results.append(mesh_result)
     return mesh_results
 
@@ -306,7 +330,7 @@ def feature_extract(
     img_or_path,
     det_results,
     bbox_thr=None,
-    format='xywh',
+    format="xywh",
 ):
     """Extract image features with a list of person bounding boxes.
 
@@ -330,7 +354,7 @@ def feature_extract(
             and the features.
     """
     # only two kinds of bbox format is supported.
-    assert format in ['xyxy', 'xywh']
+    assert format in ["xyxy", "xywh"]
 
     cfg = model.cfg
     device = next(model.parameters()).device
@@ -340,7 +364,7 @@ def feature_extract(
         return feature_results
 
     # Change for-loop preprocess each bbox to preprocess all bboxes at once.
-    bboxes = np.array([box['bbox'] for box in det_results])
+    bboxes = np.array([box["bbox"] for box in det_results])
     assert len(bboxes[0]) in [4, 5]
 
     # Select bboxes by score threshold
@@ -354,7 +378,7 @@ def feature_extract(
     if len(bboxes) == 0:
         return feature_results
 
-    if format == 'xyxy':
+    if format == "xyxy":
         bboxes_xyxy = bboxes
         bboxes_xywh = xyxy2xywh(bboxes)
     else:
@@ -366,20 +390,19 @@ def feature_extract(
     extractor_pipeline = [LoadImage()] + cfg.extractor_pipeline
     extractor_pipeline = Compose(extractor_pipeline)
     batch_data = []
-    input_size = cfg['img_res']
-    aspect_ratio = 1 if isinstance(input_size,
-                                   int) else input_size[0] / input_size[1]
+    input_size = cfg["img_res"]
+    aspect_ratio = 1 if isinstance(input_size, int) else input_size[0] / input_size[1]
 
     for i, bbox in enumerate(bboxes_xywh):
         center, scale = box2cs(bbox, aspect_ratio, bbox_scale_factor=1.25)
         # prepare data
         data = {
-            'image_path': img_or_path,
-            'center': center,
-            'scale': scale,
-            'rotation': 0,
-            'bbox_score': bbox[4] if len(bbox) == 5 else 1,
-            'sample_idx': i,
+            "image_path": img_or_path,
+            "center": center,
+            "scale": scale,
+            "rotation": 0,
+            "bbox_score": bbox[4] if len(bbox) == 5 else 1,
+            "sample_idx": i,
         }
         data = extractor_pipeline(data)
         batch_data.append(data)
@@ -388,31 +411,32 @@ def feature_extract(
 
     if next(model.parameters()).is_cuda:
         # scatter not work so just move image to cuda device
-        batch_data['img'] = batch_data['img'].to(device)
+        batch_data["img"] = batch_data["img"].to(device)
 
     # get all img_metas of each bounding box
-    batch_data['img_metas'] = [
-        img_metas[0] for img_metas in batch_data['img_metas'].data
+    batch_data["img_metas"] = [
+        img_metas[0] for img_metas in batch_data["img_metas"].data
     ]
 
     # forward the model
     with torch.no_grad():
-        results = model(batch_data['img'])
+        results = model(batch_data["img"])
 
         if isinstance(results, list) or isinstance(results, tuple):
             results = results[-1].mean(dim=-1).mean(dim=-1)
 
     for idx in range(len(det_results)):
         feature_result = det_results[idx].copy()
-        feature_result['bbox'] = bboxes_xyxy[idx]
-        feature_result['features'] = results[idx].cpu().numpy()
+        feature_result["bbox"] = bboxes_xyxy[idx]
+        feature_result["features"] = results[idx].cpu().numpy()
         feature_results.append(feature_result)
 
     return feature_results
 
 
-def _indexing_sequence(input: Union[Sequence, Dict[str, Sequence]],
-                       index: Union[int, Tuple[int, ...]]):
+def _indexing_sequence(
+    input: Union[Sequence, Dict[str, Sequence]], index: Union[int, Tuple[int, ...]]
+):
     """Get item of the specified index from input.
 
     Args:
@@ -455,18 +479,16 @@ def _gather_input_features(extracted_results):
         frame_inputs = []
         for res in frame:
             inputs = dict()
-            if 'features' in res:
-                inputs['features'] = res['features']
-            if 'track_id' in res:
-                inputs['track_id'] = res['track_id']
+            if "features" in res:
+                inputs["features"] = res["features"]
+            if "track_id" in res:
+                inputs["track_id"] = res["track_id"]
             frame_inputs.append(inputs)
         sequence_inputs.append(frame_inputs)
     return sequence_inputs
 
 
-def _collate_feature_sequence(extracted_features,
-                              with_track_id=True,
-                              target_frame=0):
+def _collate_feature_sequence(extracted_features, with_track_id=True, target_frame=0):
     """Reorganize multi-frame feature extraction results into individual
     feature sequences.
 
@@ -491,40 +513,37 @@ def _collate_feature_sequence(extracted_features,
 
     target_frame = (T + target_frame) % T  # convert negative index to positive
 
-    N = len(
-        extracted_features[target_frame])  # use identities in the target frame
+    N = len(extracted_features[target_frame])  # use identities in the target frame
     if N == 0:
         return []
 
-    C = extracted_features[target_frame][0]['features'].shape[0]
+    C = extracted_features[target_frame][0]["features"].shape[0]
 
     track_ids = None
     if with_track_id:
-        track_ids = [
-            res['track_id'] for res in extracted_features[target_frame]
-        ]
+        track_ids = [res["track_id"] for res in extracted_features[target_frame]]
 
     feature_sequences = []
     for idx in range(N):
         feature_seq = dict()
         # gather static information
         for k, v in extracted_features[target_frame][idx].items():
-            if k != 'features':
+            if k != "features":
                 feature_seq[k] = v
         # gather keypoints
         if not with_track_id:
-            feature_seq['features'] = np.stack(
-                [frame[idx]['features'] for frame in extracted_features])
+            feature_seq["features"] = np.stack(
+                [frame[idx]["features"] for frame in extracted_features]
+            )
         else:
             features = np.zeros((T, C), dtype=np.float32)
-            features[target_frame] = extracted_features[target_frame][idx][
-                'features']
+            features[target_frame] = extracted_features[target_frame][idx]["features"]
             # find the left most frame containing track_ids[idx]
             for frame_idx in range(target_frame - 1, -1, -1):
                 contains_idx = False
                 for res in extracted_features[frame_idx]:
-                    if res['track_id'] == track_ids[idx]:
-                        features[frame_idx] = res['features']
+                    if res["track_id"] == track_ids[idx]:
+                        features[frame_idx] = res["features"]
                         contains_idx = True
                         break
                 if not contains_idx:
@@ -535,15 +554,116 @@ def _collate_feature_sequence(extracted_features,
             for frame_idx in range(target_frame + 1, T):
                 contains_idx = False
                 for res in extracted_features[frame_idx]:
-                    if res['track_id'] == track_ids[idx]:
-                        features[frame_idx] = res['features']
+                    if res["track_id"] == track_ids[idx]:
+                        features[frame_idx] = res["features"]
                         contains_idx = True
                         break
                 if not contains_idx:
                     # replicate the right most frame
                     features[frame_idx] = features[frame_idx - 1]
                     # break
-            feature_seq['features'] = features
+            feature_seq["features"] = features
         feature_sequences.append(feature_seq)
 
     return feature_sequences
+
+
+# By Yuchen, 23.08.27, 用于从heatmap得到2d关键点
+def heatmap_to_keypoints2d(heatmaps, trans):
+    # 转化为 COCO 关键点
+    coco = [24, 26, 25, 28, 27, 16, 17, 18, 19, 20, 21, 46, 45, 4, 5, 7, 8]
+    heatmap = heatmaps[:, coco, :, :]
+
+    # heatmap的shape：[num_person, 17, 56, 56]
+    keypoints_2d = []
+    for idx, person in enumerate(heatmap):
+        # 仿射变换，将keypoint调整到原图
+        inverse = cv2.invertAffineTransform(trans[idx])
+        tmp = []
+        for idx in range(person.shape[0]):
+            resized = cv2.resize(person[idx], (224, 224))
+
+            pts = np.argmax(resized)
+            y = pts / 224
+            x = pts % 224
+
+            kp2d = np.array([x, y, 1])
+            kp2d = inverse @ kp2d
+            tmp.append(kp2d)
+        keypoints_2d.append(tmp)
+
+    keypoints_2d = np.array(keypoints_2d)
+
+    return keypoints_2d
+
+
+def get_pelvis_2d(heatmaps, trans):
+    # pelvis index
+    pelvis = [0]
+    heatmap = heatmaps[:, pelvis, :, :]
+
+    # heatmap的shape：[num_person, 17, 56, 56]
+    pelvis_2d = []
+    for idx, person in enumerate(heatmap):
+        # 仿射变换，将keypoint调整到原图
+        inverse = cv2.invertAffineTransform(trans[idx])
+        tmp = []
+        for idx in range(person.shape[0]):
+            resized = cv2.resize(person[idx], (224, 224))
+
+            pts = np.argmax(resized)
+            y = pts / 224
+            x = pts % 224
+
+            kp2d = np.array([x, y, 1])
+            kp2d = inverse @ kp2d
+            tmp.append(kp2d)
+        pelvis_2d.append(tmp)
+
+    pelvis_2d = np.array(pelvis_2d)
+
+    return pelvis_2d
+
+
+def vis_keypoints_2d(image, keypoints, pelvis):
+    '''
+    image: (224, 224, 3)
+    keypoints: (17, 2)
+    pelvis: (1, 2)
+    '''
+    links = [
+        (0, 1),
+        (0, 2),
+        (1, 3),
+        (2, 4),
+        ("c", 0),
+        ("c", 5),
+        ("c", 6),
+        ("c", 11),
+        ("c", 12),
+        (5, 7),
+        (7, 9),
+        (6, 8),
+        (8, 10),
+        (11, 13),
+        (13, 15),
+        (12, 14),
+        (14, 16),
+    ]
+
+    img = image
+    kps = keypoints
+    center = 1 / 2 * (kps[5] + kps[6])
+    pvs = pelvis.squeeze(0)
+
+    cv2.circle(img, pvs.astype(int), 10, (255, 0, 0), -1)
+
+    for kp in kps:
+        cv2.circle(img, kp.astype(int), 5, (0, 0, 255), -1)
+
+    for link in links:
+        pt1 = kps[link[0]] if link[0] != "c" else center
+        pt2 = kps[link[1]] if link[1] != "c" else center
+        cv2.line(img, pt1.astype(int), pt2.astype(int), (0, 0, 255), 2, 8)
+
+    cv2.imwrite("tmp/keypoints.png", img)

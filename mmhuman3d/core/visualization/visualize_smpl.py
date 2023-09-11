@@ -480,7 +480,8 @@ def render_smpl(
         kp3d: Optional[Union[np.ndarray, torch.Tensor]] = None,
         mask: Optional[Union[np.ndarray, List[int]]] = None,
         vis_kp_index: bool = False,
-        verbose: bool = False) -> Union[None, torch.Tensor]:
+        verbose: bool = False,
+        fps: int = 15) -> Union[None, torch.Tensor]:
     """Render SMPL or SMPL-X mesh or silhouette into differentiable tensors,
     and export video or images.
 
@@ -1013,6 +1014,7 @@ def render_smpl(
         plot_kps=plot_kps,
         vis_kp_index=vis_kp_index,
         final_resolution=final_resolution,
+        fps=fps,
         **render_param_dict)
 
     cameras = build_cameras(

@@ -53,6 +53,8 @@ SMPL_45_KEYPOINTS = SMPL_KEYPOINTS + [
 
 # the full keypoints produced by the default SMPL J_regressor and
 # extra_J_regressor (provided by SPIN)
+# SMPL_54的关键点集合中，以下的index是coco的, 这是用来作行为识别的stgcn人体关键点
+# [24, 26, 25, 28, 27, 16, 17, 18, 19, 20, 21, 46, 45, 4, 5, 7, 8]
 SMPL_54_KEYPOINTS = SMPL_45_KEYPOINTS + [
     'right_hip_extra',  # LSP
     'left_hip_extra',  # LSP
@@ -121,3 +123,34 @@ SMPL_49_KEYPOINTS = [
 ]
 
 SMPL_24_KEYPOINTS = SMPL_49_KEYPOINTS[-24:]
+
+
+# if __name__ == '__main__':
+    
+#     COCO_KEYPOINTS = [
+#         'nose',
+#         'left_eye',
+#         'right_eye',
+#         'left_ear',
+#         'right_ear',
+#         'left_shoulder',
+#         'right_shoulder',
+#         'left_elbow',
+#         'right_elbow',
+#         'left_wrist',
+#         'right_wrist',
+#         'left_hip_extra',
+#         'right_hip_extra',
+#         'left_knee',
+#         'right_knee',
+#         'left_ankle',
+#         'right_ankle',
+#     ]
+#     indexs = []
+
+#     for each in COCO_KEYPOINTS:
+#         index = SMPL_54_KEYPOINTS.index(each)
+#         indexs.append(index)
+#     print(indexs)
+#     print(len(COCO_KEYPOINTS))
+#     print(len(indexs))

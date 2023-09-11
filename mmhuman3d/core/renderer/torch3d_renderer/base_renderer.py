@@ -32,6 +32,7 @@ class BaseRenderer(nn.Module):
                  device: Union[torch.device, str] = 'cpu',
                  output_path: Optional[str] = None,
                  out_img_format: str = '%06d.png',
+                 fps: int = 15,
                  **kwargs) -> None:
         """BaseRenderer for differentiable rendering and visualization.
 
@@ -87,6 +88,7 @@ class BaseRenderer(nn.Module):
         self.resolution = resolution
         self.temp_path = None
         self.out_img_format = out_img_format
+        self.fps = fps
         self._set_output_path(output_path)
         self._init_renderer(**kwargs)
 
@@ -213,7 +215,8 @@ class BaseRenderer(nn.Module):
                 images_to_video(
                     input_folder=folder,
                     output_path=self.output_path,
-                    img_format=self.out_img_format)
+                    img_format=self.out_img_format,
+                    fps=self.fps)
             elif check_path_suffix(self.output_path, ['.gif']):
                 images_to_gif(
                     input_folder=folder,

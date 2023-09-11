@@ -34,6 +34,7 @@ class SMPLRenderer(BaseRenderer):
                  plot_kps: bool = False,
                  vis_kp_index: bool = False,
                  final_resolution: Tuple[int, int] = None,
+                 fps: int = 15,
                  **kwargs) -> None:
         super(BaseRenderer, self).__init__()
 
@@ -48,6 +49,7 @@ class SMPLRenderer(BaseRenderer):
         self.out_img_format = out_img_format
         self.final_resolution = final_resolution
         self.return_tensor = return_tensor
+        self.fps = fps
         if output_path is not None:
             if check_path_suffix(output_path, ['.mp4', '.gif']):
                 self.temp_path = osp.join(

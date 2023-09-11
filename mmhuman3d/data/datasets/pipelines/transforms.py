@@ -770,6 +770,13 @@ class MeshAffine:
                 flags=cv2.INTER_LINEAR)
             results['img'] = img
 
+            # cv2.imwrite("tmp/ori.png", ori_img)
+            # cv2.imwrite("tmp/img.png", img)
+
+            # inverse_trans = cv2.invertAffineTransform(trans)
+            # restored_img = cv2.warpAffine(img, inverse_trans, (1920, 1080), flags=cv2.INTER_LINEAR)
+            # cv2.imwrite("tmp/inverse.png", restored_img)
+
         if 'keypoints2d' in results:
             keypoints2d = results['keypoints2d'].copy()
             num_keypoints = len(keypoints2d)
